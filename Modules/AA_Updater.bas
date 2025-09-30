@@ -1,7 +1,8 @@
+Private Const ThisModuleName As String = "AA_Updater"
 ' 폴더구조로 선별 후 출력
 Sub ExportAllVbaComponents()
-    Dim vbComp As Object, FSO As Object
-    Dim basePath As String, folderModules As String, folderClasses As String, folderForms As String, FileName As String
+    Dim vbComp As Object, fso As Object
+    Dim basePath As String, folderModules As String, folderClasses As String, folderForms As String, fileName As String
 
     ' 기본 경로 설정
     basePath = ThisWorkbook.Path & "\ExcelExportedCodes\"
@@ -10,23 +11,23 @@ Sub ExportAllVbaComponents()
     folderForms = basePath & "Forms\"
 
     ' 폴더 생성
-    Set FSO = CreateObject("Scripting.FileSystemObject")
-    If Not FSO.FolderExists(basePath) Then FSO.CreateFolder basePath
-    If Not FSO.FolderExists(folderModules) Then FSO.CreateFolder folderModules
-    If Not FSO.FolderExists(folderClasses) Then FSO.CreateFolder folderClasses
-    If Not FSO.FolderExists(folderForms) Then FSO.CreateFolder folderForms
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    If Not fso.FolderExists(basePath) Then fso.CreateFolder basePath
+    If Not fso.FolderExists(folderModules) Then fso.CreateFolder folderModules
+    If Not fso.FolderExists(folderClasses) Then fso.CreateFolder folderClasses
+    If Not fso.FolderExists(folderForms) Then fso.CreateFolder folderForms
 
     ' 구성 요소 반복하며 내보내기
     For Each vbComp In ThisWorkbook.VBProject.VBComponents
         Select Case vbComp.Type
-            Case 1: FileName = folderModules & vbComp.Name & ".bas"   ' 표준 모듈
-            Case 2: FileName = folderClasses & vbComp.Name & ".cls"   ' 클래스 모듈
-            Case 3: FileName = folderForms & vbComp.Name & ".frm"     ' 사용자 폼
-            Case Else: FileName = vbNullString
+            Case 1: fileName = folderModules & vbComp.Name & ".bas"   ' 표준 모듈
+            Case 2: fileName = folderClasses & vbComp.Name & ".cls"   ' 클래스 모듈
+            Case 3: fileName = folderForms & vbComp.Name & ".frm"     ' 사용자 폼
+            Case Else: fileName = vbNullString
         End Select
 
-        If FileName <> vbNullString Then
-            vbComp.Export FileName
+        If fileName <> vbNullString Then
+            vbComp.Export fileName
         End If
     Next vbComp
 
@@ -34,15 +35,10 @@ Sub ExportAllVbaComponents()
 End Sub
 ' .Txt .Md 출력
 Sub ExportAllModulesDirectlyToTextAndMarkdown()
-    Dim vbComp As Object
-    Dim FSO As Object
-    Dim exportPath As String
-    Dim ext As String, FileName As String
-    Dim codeLine As Variant
-    Dim codeLines() As String
-    Dim txtStream As Object, mdStream As Object
-    Dim baseName As String, timeStamp As String
-    Dim TxtFile As String, mdFile As String
+    Dim vbComp As Object, fso As Object, txtStream As Object, mdStream As Object
+    Dim exportPath As String, ext As String, fileName As String
+    Dim codeLine As Variant, codeLines() As String
+    Dim baseName As String, timeStamp As String, TxtFile As String, mdFile As String
     Dim totalLines As Long
 
     ' 파일명 구성
@@ -53,8 +49,8 @@ Sub ExportAllModulesDirectlyToTextAndMarkdown()
     mdFile = exportPath & baseName & "_SourceCode_" & timeStamp & ".md"
 
     ' 폴더 생성
-    Set FSO = CreateObject("Scripting.FileSystemObject")
-    If Not FSO.FolderExists(exportPath) Then FSO.CreateFolder exportPath
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    If Not fso.FolderExists(exportPath) Then fso.CreateFolder exportPath
 
     ' 스트림 생성 (UTF-8)
     Set txtStream = CreateObject("ADODB.Stream")
@@ -81,7 +77,7 @@ Sub ExportAllModulesDirectlyToTextAndMarkdown()
         End Select
 
         If ext <> "" Then
-            FileName = vbComp.Name & ext
+            fileName = vbComp.Name & ext
             totalLines = vbComp.CodeModule.CountOfLines
 
             ' 코드 읽기
@@ -93,11 +89,11 @@ Sub ExportAllModulesDirectlyToTextAndMarkdown()
 
             ' TXT 파일 작성
             txtStream.WriteText String(60, "'") & vbLf
-            txtStream.WriteText FileName & " Start" & vbLf
+            txtStream.WriteText fileName & " Start" & vbLf
             txtStream.WriteText String(60, "'") & vbLf
 
             ' MD 파일 작성
-            mdStream.WriteText "### " & FileName & vbLf
+            mdStream.WriteText "### " & fileName & vbLf
             mdStream.WriteText "````vba" & vbLf
 
             For Each codeLine In codeLines
@@ -106,7 +102,7 @@ Sub ExportAllModulesDirectlyToTextAndMarkdown()
             Next codeLine
 
             txtStream.WriteText String(60, "'") & vbLf
-            txtStream.WriteText FileName & " End" & vbLf
+            txtStream.WriteText fileName & " End" & vbLf
             txtStream.WriteText String(60, "'") & vbLf & vbLf
 
             mdStream.WriteText "````" & vbLf & vbLf
@@ -213,4 +209,64 @@ Function DownloadFile(url As String, savePath As String) As Boolean
         ' 다운로드 실패
         DownloadFile = False
     End If
+End Function
+
+' === Export 구조 기반 Import 유틸리티 ===
+' - Export된 모듈을 폴더에서 불러와 ThisWorkbook에 적재
+' - 중복된 모듈명은 자동 제거 후 Import
+
+Public Sub ImportAllVbaComponents()
+    Dim basePath As String
+    basePath = ThisWorkbook.Path & "\ExcelExportedCodes\"
+   
+    ImportModulesFromFolder basePath & "Modules\"
+    ImportModulesFromFolder basePath & "Classes\"
+    ImportModulesFromFolder basePath & "Forms\"
+   
+    MsgBox "Import 완료!", vbInformation
+End Sub
+
+Private Sub ImportModulesFromFolder(ByVal folderPath As String)
+    Dim fso As Object, file As Object, files As Object
+    Dim vbCompName As String, vbProj As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    If Not fso.FolderExists(folderPath) Then Exit Sub
+
+    Set vbProj = ThisWorkbook.VBProject
+    Set files = fso.GetFolder(folderPath).files
+   
+    For Each file In files
+        If IsVbaFile(file.Name) Then
+            vbCompName = GetVBNameFromFile(file.Path)
+            If LenB(vbCompName) > 0 And Not (vbCompName = ThisModuleName) Then
+                ' 기존 모듈 삭제
+                On Error Resume Next
+                vbProj.VBComponents.Remove vbProj.VBComponents(vbCompName)
+                On Error GoTo 0
+            End If
+            vbProj.VBComponents.Import file.Path
+        End If
+    Next
+End Sub
+
+Private Function IsVbaFile(ByVal fileName As String) As Boolean
+    Dim ext As String
+    ext = LCase$(Mid(fileName, InStrRev(fileName, ".") + 1))
+    IsVbaFile = (ext = "bas" Or ext = "cls" Or ext = "frm")
+End Function
+
+Private Function GetVBNameFromFile(ByVal filePath As String) As String
+    Dim ff As Integer: ff = FreeFile
+    Dim line As String, vbName As String
+    Open filePath For Input As #ff
+    Do While Not EOF(ff)
+        Line Input #ff, line
+        If LCase$(line) Like "*attribute vb_name*" Then
+            vbName = Trim$(Split(line, "=")(1))
+            vbName = Replace(vbName, """", "")
+            Exit Do
+        End If
+    Loop
+    Close #ff
+    GetVBNameFromFile = vbName
 End Function
