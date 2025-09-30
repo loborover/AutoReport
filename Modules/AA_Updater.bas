@@ -1,10 +1,7 @@
 ' 폴더구조로 선별 후 출력
 Sub ExportAllVbaComponents()
-    Dim vbComp As Object
-    Dim FSO As Object
-    Dim basePath As String
-    Dim folderModules As String, folderClasses As String, folderForms As String
-    Dim FileName As String
+    Dim vbComp As Object, FSO As Object
+    Dim basePath As String, folderModules As String, folderClasses As String, folderForms As String, FileName As String
 
     ' 기본 경로 설정
     basePath = ThisWorkbook.Path & "\ExcelExportedCodes\"
