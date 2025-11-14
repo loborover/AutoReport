@@ -6,9 +6,9 @@ Private Title As String
 Private PrintRange As Range
 Private ColumnsForReport As New Collection
 ' 문서 서식 자동화
-Private Sub AutoReport_BOM(ByRef wb As Workbook)
+Private Sub AutoReport_BOM(ByRef Wb As Workbook)
     Dim ws As Worksheet
-    Set ws = wb.ActiveSheet
+    Set ws = Wb.ActiveSheet
     Dim LastCol As Long
     Dim i As Long '반복문용 변수
     Dim DelCell As Range '반복문용 변수
@@ -187,7 +187,7 @@ Public Sub Print_BOM(Optional Handle As Boolean)
     
     For i = 1 To ListCount ' 체크박스 활성화된 아이템 선별
         Set BOMitem = BOMLV.ListItems.Item(i)
-        If BOMitem.Checked Then Chkditem.Add BOMitem.index 'SubItems(1)
+        If BOMitem.Checked Then Chkditem.Add BOMitem.Index 'SubItems(1)
     Next i
     
     If Chkditem.Count < 1 Then MsgBox "선택된 문서 없음": Exit Sub
@@ -236,15 +236,9 @@ Private Function GetModelName(BOMdirectory As String) As String
     Dim xlApp As Excel.Application
     Set xlApp = New Excel.Application
     xlApp.Visible = False
-    'xlApp.Visible = True
 
-    ' 워크북 열기
-    Dim wb As Workbook
-    Set wb = xlApp.Workbooks.open(BOMdirectory)
-
-    ' 워크시트 선택
-    Dim ws As Worksheet
-    Set ws = wb.Worksheets(1)
+    Dim Wb As Workbook: Set Wb = xlApp.Workbooks.open(BOMdirectory) ' 워크북 열기
+    Dim ws As Worksheet: Set ws = Wb.Worksheets(1) ' 워크시트 선택
 
     ' 값을 읽어오기
     'Dim Title As String 모듈선언부의 Title 활용
@@ -255,8 +249,8 @@ Private Function GetModelName(BOMdirectory As String) As String
     GetModelName = Title
 
     ' 워크북 닫기
-    wb.Close SaveChanges:=False
-    Set wb = Nothing
+    Wb.Close SaveChanges:=False
+    Set Wb = Nothing
 
     ' Excel 애플리케이션 종료
     xlApp.Quit
@@ -629,7 +623,7 @@ Public Sub Print_DailyPlan(Optional Handle As Boolean)
 
     For i = 1 To ListCount ' 체크박스 활성화된 아이템 선별
         Set DPitem = DPLV.ListItems.Item(i)
-        If DPitem.Checked Then Chkditem.Add DPitem.index 'SubItems(1)
+        If DPitem.Checked Then Chkditem.Add DPitem.Index 'SubItems(1)
     Next i
     
     If Chkditem.Count < 1 Then MsgBox "선택된 문서 없음": Exit Sub
@@ -671,9 +665,9 @@ AutoReportHandler.UpdateProgressBar AutoReportHandler.PB_BOM, i / ListCount * 10
 End Sub
 ' 문서 서식 자동화
 
-Private Sub AutoReport_DailyPlan(ByRef wb As Workbook)
+Private Sub AutoReport_DailyPlan(ByRef Wb As Workbook)
     ' 초기화 변수
-    Set Target_WorkSheet = wb.Worksheets(1)
+    Set Target_WorkSheet = Wb.Worksheets(1)
     Set vCFR = New Collection
     
     Dim LastCol As Long, LastRow As Long ' DailyPlan 데이터가 있는 마지막 행
@@ -688,18 +682,17 @@ Private Sub AutoReport_DailyPlan(ByRef wb As Workbook)
     Set vCFR = Nothing
 End Sub
 Private Sub AR_1_EssentialDataExtraction(Optional ByRef LastCol As Long = 0, Optional ByRef LastRow As Long = 0) ' AutoReport 초반 설정 / 필수 데이터 영역만 추출함
-    Dim i As Long, StartRow As Long
+    Dim i As Long, startRow As Long
     Dim DelCell As Range
     Dim CopiedData As New Collection ', TimeKeeper As New Collection
     Dim ws As Worksheet: Set ws = Target_WorkSheet
-    'Dim CrrTime As Date, NxtTime As Date, ChkTime As Date
     
     Application.DisplayAlerts = False ' 경고문 비활성화
     
     ' 투입시점 시작시간 추출
     Set DelCell = ws.Cells.Find("Planned Start Time", lookAt:=xlWhole, MatchCase:=True) ' 투입시점 Range추출
-    i = DelCell.Column: StartRow = DelCell.Row + 3: LastRow = Target_WorkSheet.Cells(ws.Rows.Count, 1).End(xlUp).Row
-    MergeDateTime_Flexible ws, i, 1, , StartRow, "", "h:mm"
+    i = DelCell.Column: startRow = DelCell.Row + 3: LastRow = Target_WorkSheet.Cells(ws.Rows.Count, 1).End(xlUp).Row
+    MergeDateTime_Flexible ws, i, 1, , startRow, "", "h:mm"
     
     ' 필요없는 행열 삭제/숨기기
     ws.Rows(1).Delete: ws.Columns("B:D").Delete ' 잉여 행열 삭제
@@ -718,7 +711,7 @@ Private Sub AR_1_EssentialDataExtraction(Optional ByRef LastCol As Long = 0, Opt
     DelCell.value = "계획" ' 원래의 열 제목이 너무 길어서 수정
     DelCell.Offset(0, 1).value = "IN" ' 원래의 열 제목이 너무 길어서 수정
     DelCell.Offset(0, 2).value = "OUT" ' 원래의 열 제목이 너무 길어서 수정
-    StartRow = DelCell.Offset(2, 0).Row ' StartRow 추출
+    startRow = DelCell.Offset(2, 0).Row ' StartRow 추출
     Set DelCell = DelCell.Offset(0, 3) ' 계획 셀에서 오른쪽으로 열이동 3번 하면 금일 날짜 나옴
     ws.Columns(DelCell.Column).Insert Shift:=xlShiftToRight, CopyOrigin:=xlFormatFromLeftOrAbove ' Connecter 2*2셀로 만듦
     ws.Columns(DelCell.Column).Insert Shift:=xlShiftToRight, CopyOrigin:=xlFormatFromLeftOrAbove
@@ -750,11 +743,15 @@ Private Sub AR_1_EssentialDataExtraction(Optional ByRef LastCol As Long = 0, Opt
     DelCell.Offset(1, 0).value = Application.WorksheetFunction.Sum(ws.Range(DelCell.Offset(2, 0), ws.Cells(LastRow, DelCell.Column)))
     If DelCell.Offset(1, 0).value > 9999 Then DelCell.Offset(1, 0).value = Format(DelCell.Offset(1, 0).value / 1000, "0.0") & "k"
     
-    For i = StartRow To LastRow
+    For i = startRow To LastRow
         ws.Cells(i, 20).value = Time_Filtering(ws.Cells(i, 1).value, ws.Cells(i + 1, 1).value)
         ws.Cells(i, 21).value = ws.Cells(i, 20).value / ws.Cells(i, 4).value
     Next i
-    ws.Cells(1, 16).value = "Meta_Data": ws.Cells(3, 16).value = "3001": ws.Cells(3, 17).value = "2101": ws.Cells(3, 18).value = "2102": ws.Cells(3, 19).value = "3304": ws.Cells(3, 20).value = "TPL": ws.Cells(3, 21).value = "UPPH"
+    ws.Cells(1, 16).value = "Meta_Data"
+    Dim arr As Variant: arr = Array("3001", "2101", "2102", "3304", "TPL", "UPPH")
+    For i = LBound(arr) To UBound(arr)
+        ws.Cells(startRow - 1, 16 + i).value = CStr(arr(i))
+    Next i
     ws.Range(ws.Columns(20), ws.Columns(21)).NumberFormat = "[m]:ss"
     
     With ws.Range(ws.Cells(1, 1), ws.Cells(2, LastCol))
@@ -766,27 +763,27 @@ Private Sub AR_1_EssentialDataExtraction(Optional ByRef LastCol As Long = 0, Opt
     
 End Sub
 ' Grouping for each LOT Models
-Public Function AR_2_ModelGrouping4(Optional ByRef StartRow As Long = 4, Optional ByRef StartCol As Long = 3, Optional ByRef TargetWorkSheet As Worksheet, Optional MainOrSub As MorS = -1) As D_Maps
-    Dim tws As Worksheet: If TargetWorkSheet Is Nothing Then Set tws = Target_WorkSheet Else Set tws = TargetWorkSheet
+Public Function AR_2_ModelGrouping4(Optional ByRef startRow As Long = 4, Optional ByRef StartCol As Long = 3, Optional ByRef TargetWorkSheet As Worksheet, Optional MainOrSub As MorS = -1) As D_Maps
+    Dim tWS As Worksheet: If TargetWorkSheet Is Nothing Then Set tWS = Target_WorkSheet Else Set tWS = TargetWorkSheet
     Dim Marker As New D_Maps
     Dim Checker As New ProductModel2
-    Dim CurrRow As Long: CurrRow = StartRow
+    Dim CurrRow As Long: CurrRow = startRow
     Dim StartRow_Prcss As Long: StartRow_Prcss = 0
     Dim EndRow As Long
-    Dim LastRow As Long: LastRow = tws.Cells(tws.Rows.Count, StartCol).End(xlUp).Row
+    Dim LastRow As Long: LastRow = tWS.Cells(tWS.Rows.Count, StartCol).End(xlUp).Row
     Dim CriterionField As ModelinfoFeild
 
-    Checker.SetModel tws.Cells(CurrRow, StartCol), tws.Cells(CurrRow + 1, StartCol)
+    Checker.SetModel tWS.Cells(CurrRow, StartCol), tWS.Cells(CurrRow + 1, StartCol)
     If MainOrSub = -1 Or MainOrSub = SubG Then
         Do While CurrRow <= LastRow + 1
             If StartRow_Prcss = 0 Then StartRow_Prcss = CurrRow
-            If CurrRow <> StartRow Then
-                Checker.NextModel tws.Cells(CurrRow + 1, StartCol)
+            If CurrRow <> startRow Then
+                Checker.NextModel tWS.Cells(CurrRow + 1, StartCol)
             End If
     
             If Checker.Crr.Number <> Checker.Nxt.Number Then
                 EndRow = CurrRow
-                Marker.Set_Lot tws.Cells(StartRow_Prcss, StartCol), tws.Cells(EndRow, StartCol), SubG
+                Marker.Set_Lot tWS.Cells(StartRow_Prcss, StartCol), tWS.Cells(EndRow, StartCol), SubG
                 StartRow_Prcss = 0
             End If
             CurrRow = CurrRow + 1
@@ -816,7 +813,7 @@ Public Function AR_2_ModelGrouping4(Optional ByRef StartRow As Long = 4, Optiona
                 End If
             ElseIf Not Checker.Compare2Models(vCurr, vNext, CriterionField) Then
                 EndRow = Marker.Sub_Lot(CurrRow).End_R.Row
-                Marker.Set_Lot tws.Cells(StartRow_Prcss, StartCol), tws.Cells(EndRow, StartCol)
+                Marker.Set_Lot tWS.Cells(StartRow_Prcss, StartCol), tWS.Cells(EndRow, StartCol)
                 StartRow_Prcss = 0
             End If
             CurrRow = CurrRow + 1
@@ -949,8 +946,8 @@ End Sub
 Private Function GetDailyPlanWhen(DailyPlanDirectiory As String) As String
     ' Excel 애플리케이션을 새로운 인스턴스로 생성
     Dim xlApp As Excel.Application: Set xlApp = New Excel.Application: xlApp.Visible = False
-    Dim wb As Workbook: Set wb = xlApp.Workbooks.open(DailyPlanDirectiory) ' 워크북 열기
-    Dim ws As Worksheet: Set ws = wb.Worksheets(1) ' 워크시트 선택
+    Dim Wb As Workbook: Set Wb = xlApp.Workbooks.open(DailyPlanDirectiory) ' 워크북 열기
+    Dim ws As Worksheet: Set ws = Wb.Worksheets(1) ' 워크시트 선택
 
     ' 값을 읽어오기
     Dim col(1 To 2) As Long, smallestValue As Long: smallestValue = 31
@@ -972,7 +969,7 @@ Private Function GetDailyPlanWhen(DailyPlanDirectiory As String) As String
     Set cell = ws.Rows("2:3").Find(What:="생산 라인", lookAt:=xlWhole, LookIn:=xlValues)
     wLine = cell.Offset(2, 0).value
 NAD:
-    wb.Close SaveChanges:=False: Set wb = Nothing ' 워크북 닫기
+    Wb.Close SaveChanges:=False: Set Wb = Nothing ' 워크북 닫기
     xlApp.Quit: Set xlApp = Nothing ' Excel 애플리케이션 종료
 End Function
 
@@ -1055,10 +1052,10 @@ Public Sub Painter_Test()
     Dim AAA As New Painter: Set AAA.DrawingWorksheet = ws
     Dim i As Long
     AAA.DeleteShapes ': Exit Sub
-    Const StartRow As Long = 3
+    Const startRow As Long = 3
     Const Gap As Long = 3
     
-    Dim A As Long, b As Long, c As Long, d As Long
+    Dim a As Long, b As Long, c As Long, d As Long
     Dim innerString As String, OuterString As String, BASD As Shape
     Dim SubTexts As New Collection: SubTexts.Add "ABCD"
     
@@ -1085,10 +1082,13 @@ End Sub
 Public Sub Borders_Test()
     Set ws = ThisWorkbook.Worksheets("test")
     
+    Debug.Print ws.Rows.Count
+    Debug.Print ws.Columns.Count
+    
     With ws.Cells(2, 33)
         '.Borders.Weight = xlThick
         '.Borders.LineStyle = xlContinuous: .value = "xlContinuous"
-        .Borders.LineStyle = xlDash: .Borders.Weight = xlMedium: .value = "xlDash"
+    '    .Borders.LineStyle = xlDash: .Borders.Weight = xlMedium: .value = "xlDash"
         '.Borders.LineStyle = xlDashDot: .value = "xlDashDot"
         '.Borders.LineStyle = xlDashDotDot: .value = "xlDashDotDot"
         '.Borders.LineStyle = xlDot: .value = "xlDot"
@@ -1159,6 +1159,7 @@ End Sub
 
 Private Sub Userform_Initialize() '전처리
     
+    If Not isDirSetUp Then SetUpDirectories
     Dim i As Long, wLine As Long, wDate As Long ' 반복문용 변수
     Set ws = ThisWorkbook.Worksheets("Setting"): Set UI = Me
     
@@ -1643,13 +1644,13 @@ Private Sub PL_Ddays_Counter_Change()
     Me.PL_Ddays_TB.text = Me.PL_Ddays_Counter.value
 End Sub
 Public Sub UpdateProgressBar(ProgressBar As MSComctlLib.ProgressBar, _
-                                        ByRef index As Single, _
+                                        ByRef Index As Single, _
                                         Optional vMin As Single = 0, _
                                         Optional vMax As Single = 100)
     With ProgressBar
         .Min = vMin
         .Max = vMax
-        .value = index
+        .value = Index
     End With
 End Sub
 
@@ -1758,13 +1759,13 @@ Public Function SingleLabel(ByRef Xaxis As Single, ByRef Yaxis As Single, _
     Select Case Direction ' 방향타
     Case d4LEFT, d4RIGHT
         LineEndPivot.X = Xaxis + Length
-        LineEndPivot.y = Yaxis
+        LineEndPivot.Y = Yaxis
     Case d4UP, d4DOWN
         LineEndPivot.X = Xaxis
-        LineEndPivot.y = Yaxis + Length
+        LineEndPivot.Y = Yaxis + Length
     End Select
 
-    Set shp(1) = DrawingWS.Shapes.AddLine(Xaxis, Yaxis, LineEndPivot.X, LineEndPivot.y)
+    Set shp(1) = DrawingWS.Shapes.AddLine(Xaxis, Yaxis, LineEndPivot.X, LineEndPivot.Y)
     
     With shp(1) ' 메인 라인
         .line.ForeColor.RGB = RGB(0, 0, 0)
@@ -1776,7 +1777,7 @@ Public Function SingleLabel(ByRef Xaxis As Single, ByRef Yaxis As Single, _
         .Visible = msoTrue
         .Fill.ForeColor.RGB = RGB(255, 255, 255)
         .Left = LineEndPivot.X - .Width / 2
-        .Top = LineEndPivot.y - .Height / 2
+        .Top = LineEndPivot.Y - .Height / 2
         .line.Visible = msoTrue
         .line.Weight = LineWeight
         .line.ForeColor.RGB = RGB(0, 0, 0)
@@ -1833,16 +1834,16 @@ Private Function StickerLabelVertical(ByRef Xaxis As Single, ByRef Yaxis As Sing
     
     Set Transfer = GetStringMaxWidthNHeight(MainText, SubTexts) ' 입력된 텍스트의 최대 길이를 찾아 너비와 메인, 서브텍스트의 높이를 결정함.
     SubTextHeight = Transfer.Z
-    MainTextHeight = Transfer.y
+    MainTextHeight = Transfer.Y
     LabelWidth = Transfer.X + Spacing * 2 ' 중간 Rectangle 의 너비 값
     LabelHeight = MainTextHeight + Gap * 2 + (LabelFloor * (SubTextHeight + Gap)) ' 중간 Rectangle 의 높이 값
     
     LabelPivot.X = Xaxis
-    LabelPivot.y = Yaxis
+    LabelPivot.Y = Yaxis
     Position.X = LabelPivot.X - LabelWidth / 2
-    Position.y = LabelPivot.y - LabelHeight - NormalHeight / 2
+    Position.Y = LabelPivot.Y - LabelHeight - NormalHeight / 2
     
-    If Position.X <= 0 Or Position.y <= 0 Then
+    If Position.X <= 0 Or Position.Y <= 0 Then
         MsgBox "Position Error"
         Exit Function
     End If
@@ -1853,9 +1854,9 @@ Private Function StickerLabelVertical(ByRef Xaxis As Single, ByRef Yaxis As Sing
     For i = 1 To 3
         Dim Part As Long
         Part = (i - 1) * 3
-        Set shp(Part + 1) = DrawingWS.Shapes.AddShape(LabelBeginType, Position.X, Position.y, LabelWidth, NormalHeight)
-        Set shp(Part + 2) = DrawingWS.Shapes.AddShape(LabelEndType, Position.X, Position.y + LabelHeight, LabelWidth, NormalHeight)
-        Set shp(Part + 3) = DrawingWS.Shapes.AddShape(msoShapeRectangle, Position.X, Position.y + NormalHeight / 2, LabelWidth, LabelHeight)
+        Set shp(Part + 1) = DrawingWS.Shapes.AddShape(LabelBeginType, Position.X, Position.Y, LabelWidth, NormalHeight)
+        Set shp(Part + 2) = DrawingWS.Shapes.AddShape(LabelEndType, Position.X, Position.Y + LabelHeight, LabelWidth, NormalHeight)
+        Set shp(Part + 3) = DrawingWS.Shapes.AddShape(msoShapeRectangle, Position.X, Position.Y + NormalHeight / 2, LabelWidth, LabelHeight)
     Next i
             
     For i = 1 To 3
@@ -1889,8 +1890,8 @@ Private Function StickerLabelVertical(ByRef Xaxis As Single, ByRef Yaxis As Sing
     HoleSize = 8
     LabelLineWeight(3) = (LabelLineWeight(1) + LabelLineWeight(2)) / 4
     HolePivot.X = LabelPivot.X - HoleSize / 2
-    HolePivot.y = LabelPivot.y - HoleSize / 2
-    Set shp(10) = DrawingWS.Shapes.AddShape(msoShapeOval, HolePivot.X, HolePivot.y, HoleSize, HoleSize)
+    HolePivot.Y = LabelPivot.Y - HoleSize / 2
+    Set shp(10) = DrawingWS.Shapes.AddShape(msoShapeOval, HolePivot.X, HolePivot.Y, HoleSize, HoleSize)
     With shp(10)
         .Fill.ForeColor.RGB = RGB(0, 0, 0)
         .line.Visible = msoFalse
@@ -1914,7 +1915,7 @@ Private Function StickerLabelVertical(ByRef Xaxis As Single, ByRef Yaxis As Sing
             .Visible = msoTrue
             .Width = LabelWidth
             .Left = Position.X
-            .Top = Position.y + NormalHeight / 2 + Gap + (LabelFloor * (SubTextHeight + Gap))
+            .Top = Position.Y + NormalHeight / 2 + Gap + (LabelFloor * (SubTextHeight + Gap))
                 If Direction = dvDown Then .Top = .Top + LabelHeight
         End With
     
@@ -1927,7 +1928,7 @@ Private Function StickerLabelVertical(ByRef Xaxis As Single, ByRef Yaxis As Sing
                     .Visible = msoTrue
                     .Width = LabelWidth - Spacing
                     .Left = Position.X + Spacing
-                    .Top = Position.y + NormalHeight / 2 + Gap + ((LabelFloor - (LabelFloor - i + 1)) * (SubTextHeight + Gap))
+                    .Top = Position.Y + NormalHeight / 2 + Gap + ((LabelFloor - (LabelFloor - i + 1)) * (SubTextHeight + Gap))
                         If Direction = dvDown Then .Top = .Top + LabelHeight
                     
                 End With
@@ -1942,10 +1943,10 @@ Private Function StickerLabelVertical(ByRef Xaxis As Single, ByRef Yaxis As Sing
                 Dim LinePoint As New ObjPivotAxis ' 라인 지정 로직의 가독성을 위한 변수 선언
                 LinePoint.X = Position.X + Spacing
                 LinePoint.Z = Position.X + LabelWidth - Spacing
-                LinePoint.y = Position.y + (NormalHeight + Gap) / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap))
-                If Direction = dvDown Then LinePoint.y = LinePoint.y + LabelHeight
+                LinePoint.Y = Position.Y + (NormalHeight + Gap) / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap))
+                If Direction = dvDown Then LinePoint.Y = LinePoint.Y + LabelHeight
             
-                Set GLine(i) = DrawingWS.Shapes.AddLine(LinePoint.X, LinePoint.y, LinePoint.Z, LinePoint.y)
+                Set GLine(i) = DrawingWS.Shapes.AddLine(LinePoint.X, LinePoint.Y, LinePoint.Z, LinePoint.Y)
                 With GLine(i)
                     '.Visible = msoFalse ' 디버깅 중엔 라인 지우기
                     .line.ForeColor.RGB = RGB(0, 0, 0)
@@ -2030,16 +2031,16 @@ Private Function StickerLabelSide(ByRef Xaxis As Single, ByRef Yaxis As Single, 
     
     Set Transfer = GetStringMaxWidthNHeight(MainText, SubTexts) ' 입력된 텍스트의 최대 길이를 찾아 너비와 메인, 서브텍스트의 높이를 결정함.
     SubTextHeight = Transfer.Z
-    MainTextHeight = Transfer.y
+    MainTextHeight = Transfer.Y
     LabelWidth = Transfer.X + Spacing ' 중간 Rectangle 의 너비 값
     LabelHeight = MainTextHeight + Gap * 2 + (LabelFloor * (SubTextHeight + Gap)) ' 중간 Rectangle 의 높이 값
     
     LabelPivot.X = Xaxis
-    LabelPivot.y = Yaxis
+    LabelPivot.Y = Yaxis
     Position.X = LabelPivot.X - NormalWidth / 2 - LabelWidth
-    Position.y = LabelPivot.y - LabelHeight / 2
+    Position.Y = LabelPivot.Y - LabelHeight / 2
     
-    If Position.X <= 0 Or Position.y <= 0 Then
+    If Position.X <= 0 Or Position.Y <= 0 Then
         MsgBox "Position Error"
         Exit Function
     End If
@@ -2050,9 +2051,9 @@ Private Function StickerLabelSide(ByRef Xaxis As Single, ByRef Yaxis As Single, 
     For i = 1 To 3
         Dim Part As Long
         Part = (i - 1) * 3
-        Set shp(Part + 1) = DrawingWS.Shapes.AddShape(LabelBeginType, Position.X, Position.y, NormalWidth, LabelHeight)
-        Set shp(Part + 2) = DrawingWS.Shapes.AddShape(LabelEndType, Position.X + LabelWidth, Position.y, NormalWidth, LabelHeight)
-        Set shp(Part + 3) = DrawingWS.Shapes.AddShape(msoShapeRectangle, Position.X + (NormalWidth / 2), Position.y, LabelWidth, LabelHeight)
+        Set shp(Part + 1) = DrawingWS.Shapes.AddShape(LabelBeginType, Position.X, Position.Y, NormalWidth, LabelHeight)
+        Set shp(Part + 2) = DrawingWS.Shapes.AddShape(LabelEndType, Position.X + LabelWidth, Position.Y, NormalWidth, LabelHeight)
+        Set shp(Part + 3) = DrawingWS.Shapes.AddShape(msoShapeRectangle, Position.X + (NormalWidth / 2), Position.Y, LabelWidth, LabelHeight)
     Next i
     
     For i = 1 To 3
@@ -2086,8 +2087,8 @@ Private Function StickerLabelSide(ByRef Xaxis As Single, ByRef Yaxis As Single, 
     HoleSize = 8
     LabelLineWeight(3) = (LabelLineWeight(1) + LabelLineWeight(2)) / 4
     HolePivot.X = LabelPivot.X - HoleSize / 2
-    HolePivot.y = LabelPivot.y - HoleSize / 2
-    Set shp(10) = DrawingWS.Shapes.AddShape(msoShapeOval, HolePivot.X, HolePivot.y, HoleSize, HoleSize)
+    HolePivot.Y = LabelPivot.Y - HoleSize / 2
+    Set shp(10) = DrawingWS.Shapes.AddShape(msoShapeOval, HolePivot.X, HolePivot.Y, HoleSize, HoleSize)
     With shp(10)
         .Fill.ForeColor.RGB = RGB(0, 0, 0)
         .line.Visible = msoFalse
@@ -2114,7 +2115,7 @@ Private Function StickerLabelSide(ByRef Xaxis As Single, ByRef Yaxis As Single, 
             ElseIf Direction = dsRight Then
                 .Left = LabelPivot.X + NormalWidth / 2
             End If
-            .Top = Position.y + Gap * 2 + (LabelFloor * (SubTextHeight + Gap))
+            .Top = Position.Y + Gap * 2 + (LabelFloor * (SubTextHeight + Gap))
         End With
     
     If Not SubTexts Is Nothing Then
@@ -2130,7 +2131,7 @@ Private Function StickerLabelSide(ByRef Xaxis As Single, ByRef Yaxis As Single, 
                     ElseIf Direction = dsRight Then
                         .Left = LabelPivot.X + NormalWidth - Spacing
                     End If
-                    .Top = Position.y + Gap * 2 + ((LabelFloor - (LabelFloor - i + 1)) * (SubTextHeight + Gap))
+                    .Top = Position.Y + Gap * 2 + ((LabelFloor - (LabelFloor - i + 1)) * (SubTextHeight + Gap))
                 End With
             Next i
         
@@ -2139,11 +2140,11 @@ Private Function StickerLabelSide(ByRef Xaxis As Single, ByRef Yaxis As Single, 
             ReDim GLine(1 To LabelFloor) As Shape
             For i = 1 To UBound(GLine)
             If Direction = dsLeft Then
-                Set GLine(i) = DrawingWS.Shapes.AddLine(Position.X + NormalWidth / 2, Position.y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)), _
-                                                LabelPivot.X - Spacing, Position.y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)))
+                Set GLine(i) = DrawingWS.Shapes.AddLine(Position.X + NormalWidth / 2, Position.Y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)), _
+                                                LabelPivot.X - Spacing, Position.Y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)))
             ElseIf Direction = dsRight Then
-                Set GLine(i) = DrawingWS.Shapes.AddLine(LabelPivot.X + NormalWidth / 2, Position.y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)), _
-                                                LabelPivot.X + LabelWidth, Position.y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)))
+                Set GLine(i) = DrawingWS.Shapes.AddLine(LabelPivot.X + NormalWidth / 2, Position.Y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)), _
+                                                LabelPivot.X + LabelWidth, Position.Y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)))
             End If
                 With GLine(i)
                     .line.ForeColor.RGB = RGB(0, 0, 0)
@@ -2194,7 +2195,7 @@ End Function
 Private Function GetStringMaxWidthNHeight(MainText As String, SubTexts As Collection) As ObjPivotAxis
     Dim longestText As String
     Dim TextBox As Shape
-    Dim result As New ObjPivotAxis
+    Dim Result As New ObjPivotAxis
     
     ' 가장 긴 텍스트 찾기
     longestText = MainText ' 우선 MainText를 가장 긴 텍스트로 가정
@@ -2209,20 +2210,20 @@ Private Function GetStringMaxWidthNHeight(MainText As String, SubTexts As Collec
     ' MainText의 TextBox 설정 및 너비, 높이 측정
     Set TextBox = DrawingWS.Shapes.AddLabel(msoTextOrientationHorizontal, 0, 0, 0, 0)
     Call ApplyMainTextBoxSettings(TextBox, MainText)
-    result.y = TextBox.Height ' MainText의 높이
-    result.X = TextBox.Width ' MainText가 가장 길다고 가정하고 지정
+    Result.Y = TextBox.Height ' MainText의 높이
+    Result.X = TextBox.Width ' MainText가 가장 길다고 가정하고 지정
     TextBox.Delete
 
     ' SubTexts의 TextBox 설정 및 너비, 높이 측정 (MainText가 가장 길지 않은 경우)
     If Not SubTexts Is Nothing Then
         Set TextBox = DrawingWS.Shapes.AddLabel(msoTextOrientationHorizontal, 0, 0, 0, 0)
         Call ApplySubTextBoxSettings(TextBox, longestText)
-        If TextBox.Width > result.X Then result.X = TextBox.Width        ' SubText 중 가장 긴 텍스트의 너비
-        result.Z = TextBox.Height ' SubText 중 가장 긴 텍스트의 높이
+        If TextBox.Width > Result.X Then Result.X = TextBox.Width        ' SubText 중 가장 긴 텍스트의 너비
+        Result.Z = TextBox.Height ' SubText 중 가장 긴 텍스트의 높이
         TextBox.Delete
     End If
 
-    Set GetStringMaxWidthNHeight = result
+    Set GetStringMaxWidthNHeight = Result
 End Function
 
 Private Sub ApplyMainTextBoxSettings(ByRef TextBox As Shape, ByRef text As String, _
@@ -2274,7 +2275,7 @@ Private Function PivotHoleNLineDirection(ByRef HolePivot As ObjPivotAxis, ByRef 
     
     For i = 1 To 2
         Pivot(i).X = HolePivot.X - Size(i) / 2
-        Pivot(i).y = HolePivot.y - Size(i) / 2
+        Pivot(i).Y = HolePivot.Y - Size(i) / 2
     Next i
     
     With TargetShape
@@ -2282,33 +2283,33 @@ Private Function PivotHoleNLineDirection(ByRef HolePivot As ObjPivotAxis, ByRef 
         Select Case LineDirection
         Case d4UP
             Pivot(3).X = HolePivot.X
-            Pivot(3).y = .Top - LineWeight / 2
+            Pivot(3).Y = .Top - LineWeight / 2
         Case d4DOWN
             Pivot(3).X = HolePivot.X
-            Pivot(3).y = .Top + .Height + LineWeight / 2
+            Pivot(3).Y = .Top + .Height + LineWeight / 2
         Case d4LEFT
             Pivot(3).X = .Left - LineWeight / 2
-            Pivot(3).y = HolePivot.y
+            Pivot(3).Y = HolePivot.Y
         Case d4RIGHT
             Pivot(3).X = .Left + .Width + LineWeight / 2
-            Pivot(3).y = HolePivot.y
+            Pivot(3).Y = HolePivot.Y
         End Select
         
     End With
     
-    Set shp(1) = DrawingWS.Shapes.AddShape(msoShapeOval, Pivot(1).X, Pivot(1).y, Size(1), Size(1))
+    Set shp(1) = DrawingWS.Shapes.AddShape(msoShapeOval, Pivot(1).X, Pivot(1).Y, Size(1), Size(1))
     With shp(1)
         .Fill.ForeColor.RGB = RGB(255, 255, 255)
         .line.Visible = msoFalse
     End With
     
-    Set shp(2) = DrawingWS.Shapes.AddShape(msoShapeOval, Pivot(2).X, Pivot(2).y, Size(2), Size(2))
+    Set shp(2) = DrawingWS.Shapes.AddShape(msoShapeOval, Pivot(2).X, Pivot(2).Y, Size(2), Size(2))
     With shp(2)
         .Fill.ForeColor.RGB = RGB(0, 0, 0)
         .line.Visible = msoFalse
     End With
     
-    Set shp(3) = DrawingWS.Shapes.AddLine(HolePivot.X, HolePivot.y, Pivot(3).X, Pivot(3).y)
+    Set shp(3) = DrawingWS.Shapes.AddLine(HolePivot.X, HolePivot.Y, Pivot(3).X, Pivot(3).Y)
     With shp(3)
         .line.ForeColor.RGB = RGB(0, 0, 0)
         .line.Weight = BorderWeight
@@ -2396,10 +2397,10 @@ Public Sub DrawShape(ShapeType As MsoAutoShapeType, _
     
     With TargetCell
         Pivot.X = (.Left + (.Width * 4 / 5)) - Size / 2
-        Pivot.y = (.Top + (.Height / 2)) - Size / 2
+        Pivot.Y = (.Top + (.Height / 2)) - Size / 2
     End With
     
-    With DrawingWS.Shapes.AddShape(ShapeType, Pivot.X, Pivot.y, Size, Size)
+    With DrawingWS.Shapes.AddShape(ShapeType, Pivot.X, Pivot.Y, Size, Size)
         .Fill.ForeColor.RGB = RGB(0, 0, 0)
         .line.ForeColor.RGB = RGB(255, 255, 255)
         .line.Weight = 1
@@ -2447,7 +2448,7 @@ Public Function OvalBridge(StartCell As Range, EndCell As Range, _
         ElseIf Direction = dsRight Then
             StartPivot.X = (.Left + (.Width * 1 / SplitRate_Horizon)) - (OvalSize / 2)
         End If
-        StartPivot.y = (.Top + (.Height * vtclsplt_Start / 100)) - (OvalSize / 2)
+        StartPivot.Y = (.Top + (.Height * vtclsplt_Start / 100)) - (OvalSize / 2)
     End With
     
     With EndCell
@@ -2456,14 +2457,14 @@ Public Function OvalBridge(StartCell As Range, EndCell As Range, _
         ElseIf Direction = dsRight Then
             EndPivot.X = (.Left + (.Width * 1 / SplitRate_Horizon)) - (OvalSize / 2)
         End If
-        EndPivot.y = (.Top + (.Height * (100 - vtclsplt_End) / 100)) - (OvalSize / 2)
+        EndPivot.Y = (.Top + (.Height * (100 - vtclsplt_End) / 100)) - (OvalSize / 2)
     End With
     
     If ColDiff < 0 Then ' 우향타일 경우 적용
-        ForGroup(1) = Bridge(DrawOval(EndPivot.X, EndPivot.y, OvalSize), DrawOval(StartPivot.X, StartPivot.y, OvalSize), _
+        ForGroup(1) = Bridge(DrawOval(EndPivot.X, EndPivot.Y, OvalSize), DrawOval(StartPivot.X, StartPivot.Y, OvalSize), _
             LineLength, LineWeight, Direction).Name
     Else ' 좌향타일 경우 적용
-        ForGroup(1) = Bridge(DrawOval(StartPivot.X, StartPivot.y, OvalSize), DrawOval(EndPivot.X, EndPivot.y, OvalSize), _
+        ForGroup(1) = Bridge(DrawOval(StartPivot.X, StartPivot.Y, OvalSize), DrawOval(EndPivot.X, EndPivot.Y, OvalSize), _
             LineLength, LineWeight, Direction).Name
     End If
     
@@ -2481,31 +2482,31 @@ Case Is <= LRGM ' 행 차이가 1이하 = 2셀 이하 / 싱글라벨
         If Direction = dsLeft Then LabelPivot.X = StartPivot.X - LineLength + OvalSize / 2 ' 좌향시 생성지점 조정
         If Direction = dsRight Then LabelPivot.X = EndPivot.X - LineLength + OvalSize / 2 ' 우향시 생성지점 조정
     End If
-    LabelPivot.y = EndPivot.y - (EndPivot.y - StartPivot.y) / 2 + OvalSize / 2
-    ForGroup(2) = Me.StickerLabel.SingleLabel(LabelPivot.X, LabelPivot.y, MainText:=MainText, Direction:=Direction).Name
+    LabelPivot.Y = EndPivot.Y - (EndPivot.Y - StartPivot.Y) / 2 + OvalSize / 2
+    ForGroup(2) = Me.StickerLabel.SingleLabel(LabelPivot.X, LabelPivot.Y, MainText:=MainText, Direction:=Direction).Name
 Case Is > LRGM ' 행 차이가 1초과 = 2셀 이상
     Select Case Direction
     Case dsLeft
         If ColDiff < 0 Then
             LabelPivot.X = EndPivot.X - LineLength + OvalSize / 2
-            LabelPivot.y = EndPivot.y - (EndPivot.y - StartPivot.y) / 2 + OvalSize / 2
+            LabelPivot.Y = EndPivot.Y - (EndPivot.Y - StartPivot.Y) / 2 + OvalSize / 2
         Else
             LabelPivot.X = StartPivot.X - LineLength + OvalSize / 2
-            LabelPivot.y = EndPivot.y - (EndPivot.y - StartPivot.y) / 2 + OvalSize / 2
+            LabelPivot.Y = EndPivot.Y - (EndPivot.Y - StartPivot.Y) / 2 + OvalSize / 2
         End If
     
-        ForGroup(2) = Me.StickerLabel.Left(LabelPivot.X, LabelPivot.y, HoleLineDirection:=HoleLineDirection, BridgeLineWeight:=LineWeight, _
+        ForGroup(2) = Me.StickerLabel.Left(LabelPivot.X, LabelPivot.Y, HoleLineDirection:=HoleLineDirection, BridgeLineWeight:=LineWeight, _
                                 BorderWeight:=BorderWeight, MainText:=MainText, SubTexts:=SubTexts, LabelBeginType:=LabelBeginType, LabelEndType:=LabelEndType).Name
     Case dsRight
         If ColDiff < 0 Then
             LabelPivot.X = StartPivot.X - LineLength + OvalSize / 2
-            LabelPivot.y = EndPivot.y - (EndPivot.y - StartPivot.y) / 2 + OvalSize / 2
+            LabelPivot.Y = EndPivot.Y - (EndPivot.Y - StartPivot.Y) / 2 + OvalSize / 2
         Else
             LabelPivot.X = EndPivot.X - LineLength + OvalSize / 2
-            LabelPivot.y = EndPivot.y - (EndPivot.y - StartPivot.y) / 2 + OvalSize / 2
+            LabelPivot.Y = EndPivot.Y - (EndPivot.Y - StartPivot.Y) / 2 + OvalSize / 2
         End If
     
-        ForGroup(2) = Me.StickerLabel.Right(LabelPivot.X, LabelPivot.y, HoleLineDirection:=HoleLineDirection, BridgeLineWeight:=LineWeight, _
+        ForGroup(2) = Me.StickerLabel.Right(LabelPivot.X, LabelPivot.Y, HoleLineDirection:=HoleLineDirection, BridgeLineWeight:=LineWeight, _
                                 BorderWeight:=BorderWeight, MainText:=MainText, SubTexts:=SubTexts, LabelBeginType:=LabelBeginType, LabelEndType:=LabelEndType).Name
     End Select
 End Select
@@ -2532,16 +2533,16 @@ End Function
 
 Private Function DrawOval(ByVal Xaxis As Single, ByVal Yaxis As Single, _
                 Optional ByRef Size As Single = 2) As Shape
-    Dim result As Shape
-    Set result = DrawingWS.Shapes.AddShape(msoShapeOval, Xaxis, Yaxis, Size, Size)
+    Dim Result As Shape
+    Set Result = DrawingWS.Shapes.AddShape(msoShapeOval, Xaxis, Yaxis, Size, Size)
     
-    With result
+    With Result
         .Fill.ForeColor.RGB = RGB(0, 0, 0)
         .line.ForeColor.RGB = RGB(255, 255, 255)
         .line.Weight = 1
     End With
     
-    Set DrawOval = result
+    Set DrawOval = Result
 End Function
 
 Private Function Bridge(StartShp As Shape, EndShp As Shape, _
@@ -2556,10 +2557,10 @@ Private Function Bridge(StartShp As Shape, EndShp As Shape, _
         Select Case Direction
         Case dsLeft
             StartShape.X = .Width / 2 + .Left 'X
-            StartShape.y = .Height / 2 + .Top 'Y
+            StartShape.Y = .Height / 2 + .Top 'Y
         Case dsRight
             EndShape.X = .Width / 2 + .Left 'X
-            EndShape.y = .Height / 2 + .Top 'Y
+            EndShape.Y = .Height / 2 + .Top 'Y
         End Select
     End With
     
@@ -2567,17 +2568,17 @@ Private Function Bridge(StartShp As Shape, EndShp As Shape, _
         Select Case Direction
         Case dsLeft
             EndShape.X = .Width / 2 + .Left 'X
-            EndShape.y = .Height / 2 + .Top 'Y
+            EndShape.Y = .Height / 2 + .Top 'Y
         Case dsRight
             StartShape.X = .Width / 2 + .Left 'X
-            StartShape.y = .Height / 2 + .Top 'Y
+            StartShape.Y = .Height / 2 + .Top 'Y
         End Select
     End With
     
     If Direction = dsRight Then Length = Length * -1
-    Set Liner(1) = DrawingWS.Shapes.AddLine(StartShape.X, StartShape.y, StartShape.X - Length, StartShape.y)
-    Set Liner(2) = DrawingWS.Shapes.AddLine(StartShape.X - Length, StartShape.y, StartShape.X - Length, EndShape.y)
-    Set Liner(3) = DrawingWS.Shapes.AddLine(StartShape.X - Length, EndShape.y, EndShape.X, EndShape.y)
+    Set Liner(1) = DrawingWS.Shapes.AddLine(StartShape.X, StartShape.Y, StartShape.X - Length, StartShape.Y)
+    Set Liner(2) = DrawingWS.Shapes.AddLine(StartShape.X - Length, StartShape.Y, StartShape.X - Length, EndShape.Y)
+    Set Liner(3) = DrawingWS.Shapes.AddLine(StartShape.X - Length, EndShape.Y, EndShape.X, EndShape.Y)
     
     For i = 1 To 3
         With Liner(i).line
@@ -2726,10 +2727,10 @@ Public Sub TestMethod()
     Set Some = DrawingWS.Cells(5, 5)
     With Some
         Pivot.X = .Left
-        Pivot.y = .Top
+        Pivot.Y = .Top
     End With
     
-    SpotChecker Pivot.X, Pivot.y
+    SpotChecker Pivot.X, Pivot.Y
 End Sub
 Public Sub DeleteShapes()
     For i = DrawingWS.Shapes.Count To 1 Step -1
@@ -2745,42 +2746,18 @@ End Sub
 
 ### ObjPivotAxis.cls
 ````vba
-Private vXaxis As Single
-Private vYaxis As Single
-Private vZaxis As Single
-'초기화 이벤트 메서드
-'Private Sub Class_Initialize()
-'End Sub
-'소멸 이벤트 메서드
-'Private Sub Class_Terminate()
-'End Sub
-Public Property Let X(value As Single)
-    vXaxis = value
-End Property
-Public Property Get X() As Single
-    X = vXaxis
-End Property
-
-Public Property Let y(value As Single)
-    vYaxis = value
-End Property
-Public Property Get y() As Single
-    y = vYaxis
-End Property
-
-Public Property Let Z(value As Single)
-    vZaxis = value
-End Property
-Public Property Get Z() As Single
-    Z = vZaxis
-End Property
-
+Private vXaxis As Single, vYaxis As Single, vZaxis As Single
+Public Property Let X(value As Single): vXaxis = value: End Property
+Public Property Get X() As Single: X = vXaxis: End Property
+Public Property Let Y(value As Single): vYaxis = value: End Property
+Public Property Get Y() As Single: Y = vYaxis: End Property
+Public Property Let Z(value As Single): vZaxis = value: End Property
+Public Property Get Z() As Single:    Z = vZaxis: End Property
 Public Function Copy() As ObjPivotAxis
     Dim CopiedObj As New ObjPivotAxis
-    
     With CopiedObj
         .X = Me.X
-        .y = Me.y
+        .Y = Me.Y
         .Z = Me.Z
     End With
     Set Copy = CopiedObj
@@ -3009,35 +2986,38 @@ Private Sub ParseModelinfo(ByRef WOFN As String) ' 모델명을 분리, 구분�
     vFullName = WOFN
     Dot = InStr(vFullName, ".")
     vNumber = Left(vFullName, Dot - 1)
-    vSpec = Mid(vNumber, 5, 4)
+    vSpec = mid(vNumber, 5, 4)
     vType = Left(vNumber, 4)
     vSpecies = Left(vType, 2) & Left(vSpec, 2)
     vSpecNumber = vType & vSpec
-    vSuffix = Mid(vFullName, Dot + 1)
-    vColor = Mid(vNumber, 9)
+    vSuffix = mid(vFullName, Dot + 1)
+    vColor = mid(vNumber, 9)
     vTnS = Left(vType, 2) & vSpec
     
 End Sub
 Public Function Copy() As ModelInfo ' Copy Function
-    Dim cls As New ModelInfo
-    With cls
+    Dim cLS As New ModelInfo
+    With cLS
         .FullName = Me.FullName
         .WorkOrder = Me.WorkOrder
         .Set_Pivot Row:=Me.Row, Column:=Me.col
     End With
-    Set Copy = cls
+    Set Copy = cLS
 End Function
 ````
 
 ### AA_Updater.bas
 ````vba
+#Const isDev = True
+Private Const ThisModuleName As String = "AA_Updater"
+
 ' 폴더구조로 선별 후 출력
 Sub ExportAllVbaComponents()
     Dim vbComp As Object
-    Dim FSO As Object
+    Dim fso As Object
     Dim basePath As String
     Dim folderModules As String, folderClasses As String, folderForms As String
-    Dim FileName As String
+    Dim fileName As String
 
     ' 기본 경로 설정
     basePath = ThisWorkbook.Path & "\ExcelExportedCodes\"
@@ -3046,23 +3026,23 @@ Sub ExportAllVbaComponents()
     folderForms = basePath & "Forms\"
 
     ' 폴더 생성
-    Set FSO = CreateObject("Scripting.FileSystemObject")
-    If Not FSO.FolderExists(basePath) Then FSO.CreateFolder basePath
-    If Not FSO.FolderExists(folderModules) Then FSO.CreateFolder folderModules
-    If Not FSO.FolderExists(folderClasses) Then FSO.CreateFolder folderClasses
-    If Not FSO.FolderExists(folderForms) Then FSO.CreateFolder folderForms
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    If Not fso.FolderExists(basePath) Then fso.CreateFolder basePath
+    If Not fso.FolderExists(folderModules) Then fso.CreateFolder folderModules
+    If Not fso.FolderExists(folderClasses) Then fso.CreateFolder folderClasses
+    If Not fso.FolderExists(folderForms) Then fso.CreateFolder folderForms
 
     ' 구성 요소 반복하며 내보내기
     For Each vbComp In ThisWorkbook.VBProject.VBComponents
         Select Case vbComp.Type
-            Case 1: FileName = folderModules & vbComp.Name & ".bas"   ' 표준 모듈
-            Case 2: FileName = folderClasses & vbComp.Name & ".cls"   ' 클래스 모듈
-            Case 3: FileName = folderForms & vbComp.Name & ".frm"     ' 사용자 폼
-            Case Else: FileName = vbNullString
+            Case 1: fileName = folderModules & vbComp.Name & ".bas"   ' 표준 모듈
+            Case 2: fileName = folderClasses & vbComp.Name & ".cls"   ' 클래스 모듈
+            Case 3: fileName = folderForms & vbComp.Name & ".frm"     ' 사용자 폼
+            Case Else: fileName = vbNullString
         End Select
 
-        If FileName <> vbNullString Then
-            vbComp.Export FileName
+        If fileName <> vbNullString Then
+            vbComp.Export fileName
         End If
     Next vbComp
 
@@ -3070,15 +3050,10 @@ Sub ExportAllVbaComponents()
 End Sub
 ' .Txt .Md 출력
 Sub ExportAllModulesDirectlyToTextAndMarkdown()
-    Dim vbComp As Object
-    Dim FSO As Object
-    Dim exportPath As String
-    Dim ext As String, FileName As String
+    Dim vbComp As Object, fso As Object, txtStream As Object, mdStream As Object
+    Dim exportPath As String, ext As String, fileName As String
     Dim codeLine As Variant
-    Dim codeLines() As String
-    Dim txtStream As Object, mdStream As Object
-    Dim baseName As String, timeStamp As String
-    Dim TxtFile As String, mdFile As String
+    Dim codeLines() As String, baseName As String, timeStamp As String, TxtFile As String, mdFile As String
     Dim totalLines As Long
 
     ' 파일명 구성
@@ -3089,8 +3064,8 @@ Sub ExportAllModulesDirectlyToTextAndMarkdown()
     mdFile = exportPath & baseName & "_SourceCode_" & timeStamp & ".md"
 
     ' 폴더 생성
-    Set FSO = CreateObject("Scripting.FileSystemObject")
-    If Not FSO.FolderExists(exportPath) Then FSO.CreateFolder exportPath
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    If Not fso.FolderExists(exportPath) Then fso.CreateFolder exportPath
 
     ' 스트림 생성 (UTF-8)
     Set txtStream = CreateObject("ADODB.Stream")
@@ -3117,7 +3092,7 @@ Sub ExportAllModulesDirectlyToTextAndMarkdown()
         End Select
 
         If ext <> "" Then
-            FileName = vbComp.Name & ext
+            fileName = vbComp.Name & ext
             totalLines = vbComp.CodeModule.CountOfLines
 
             ' 코드 읽기
@@ -3129,11 +3104,11 @@ Sub ExportAllModulesDirectlyToTextAndMarkdown()
 
             ' TXT 파일 작성
             txtStream.WriteText String(60, "'") & vbLf
-            txtStream.WriteText FileName & " Start" & vbLf
+            txtStream.WriteText fileName & " Start" & vbLf
             txtStream.WriteText String(60, "'") & vbLf
 
             ' MD 파일 작성
-            mdStream.WriteText "### " & FileName & vbLf
+            mdStream.WriteText "### " & fileName & vbLf
             mdStream.WriteText "````vba" & vbLf
 
             For Each codeLine In codeLines
@@ -3142,7 +3117,7 @@ Sub ExportAllModulesDirectlyToTextAndMarkdown()
             Next codeLine
 
             txtStream.WriteText String(60, "'") & vbLf
-            txtStream.WriteText FileName & " End" & vbLf
+            txtStream.WriteText fileName & " End" & vbLf
             txtStream.WriteText String(60, "'") & vbLf & vbLf
 
             mdStream.WriteText "````" & vbLf & vbLf
@@ -3171,9 +3146,12 @@ Sub ForceUpdateMacro()
     ' Setting 확인
     Set ws = ThisWorkbook.Worksheets("Setting")
     If ("Dev" = ws.Cells.Find(What:="Develop", lookAt:=xlWhole, MatchCase:=True).Offset(0, 1).value) Then
-        MsgBox "개발 모드이므로 업데이트 진행 제한", vbInformation, "개발여부 확인"
+        #If Not isDev Then
+            MsgBox "개발 모드이므로 업데이트 진행 제한", vbInformation, "개발여부 확인"
+        #End If
         Exit Sub
     End If
+
     Set VersionCell = ws.Cells.Find(What:="Version", lookAt:=xlWhole, MatchCase:=True)
     'Debug.Print VersionCell.Address
     
@@ -3250,6 +3228,66 @@ Function DownloadFile(url As String, savePath As String) As Boolean
         DownloadFile = False
     End If
 End Function
+
+' === Export 구조 기반 Import 유틸리티 ===
+' - Export된 모듈을 폴더에서 불러와 ThisWorkbook에 적재
+' - 중복된 모듈명은 자동 제거 후 Import
+
+Public Sub ImportAllVbaComponents()
+    Dim basePath As String
+    basePath = ThisWorkbook.Path & "\ExcelExportedCodes\"
+   
+    ImportModulesFromFolder basePath & "Modules\"
+    ImportModulesFromFolder basePath & "Classes\"
+    ImportModulesFromFolder basePath & "Forms\"
+   
+    MsgBox "Import 완료!", vbInformation
+End Sub
+
+Private Sub ImportModulesFromFolder(ByVal folderPath As String)
+    Dim fso As Object, file As Object, files As Object
+    Dim vbCompName As String, vbProj As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    If Not fso.FolderExists(folderPath) Then Exit Sub
+
+    Set vbProj = ThisWorkbook.VBProject
+    Set files = fso.GetFolder(folderPath).files
+   
+    For Each file In files
+        If IsVbaFile(file.Name) Then
+            vbCompName = GetVBNameFromFile(file.Path)
+            If LenB(vbCompName) > 0 Then
+                ' 기존 모듈 삭제
+                On Error Resume Next
+                vbProj.VBComponents.Remove vbProj.VBComponents(vbCompName)
+                On Error GoTo 0
+            End If
+            vbProj.VBComponents.Import file.Path
+        End If
+    Next
+End Sub
+
+Private Function IsVbaFile(ByVal fileName As String) As Boolean
+    Dim ext As String
+    ext = LCase$(mid(fileName, InStrRev(fileName, ".") + 1))
+    IsVbaFile = (ext = "bas" Or ext = "cls" Or ext = "frm")
+End Function
+
+Private Function GetVBNameFromFile(ByVal filePath As String) As String
+    Dim ff As Integer: ff = FreeFile
+    Dim line As String, vbName As String
+    Open filePath For Input As #ff
+    Do While Not EOF(ff)
+        Line Input #ff, line
+        If LCase$(line) Like "*attribute vb_name*" Then
+            vbName = Trim$(Split(line, "=")(1))
+            vbName = Replace(vbName, """", "")
+            Exit Do
+        End If
+    Loop
+    Close #ff
+    GetVBNameFromFile = vbName
+End Function
 ````
 
 ### Cleaner_Handler.frm
@@ -3276,11 +3314,11 @@ Private Sub Class_Terminate()
     Set Sub_Groups = Nothing
     Set T_Lot = Nothing
 End Sub
-Public Function Main_Lot(Optional index As Variant = 1) As D_LOT
-    Set Main_Lot = Main_Groups.Item(index)
+Public Function Main_Lot(Optional Index As Variant = 1) As D_LOT
+    Set Main_Lot = Main_Groups.Item(Index)
 End Function
-Public Function Sub_Lot(Optional index As Variant = 1) As D_LOT
-    Set Sub_Lot = Sub_Groups.Item(index)
+Public Function Sub_Lot(Optional Index As Variant = 1) As D_LOT
+    Set Sub_Lot = Sub_Groups.Item(Index)
 End Function
 
 Public Sub Set_Lot(ByRef Start_Range As Range, ByRef End_Range As Range, _
@@ -3300,12 +3338,12 @@ Public Sub Set_Lot(ByRef Start_Range As Range, ByRef End_Range As Range, _
         Sub_Groups.Add T_Lot '.Copy
     End Select
 End Sub
-Public Sub Remove(index As Variant, Optional Target As MorS = MainG)
+Public Sub Remove(Index As Variant, Optional Target As MorS = MainG)
     Select Case Target
     Case MainG
-        Main_Groups.Remove index
+        Main_Groups.Remove Index
     Case SubG
-        Sub_Groups.Remove index
+        Sub_Groups.Remove Index
     End Select
 End Sub
 Public Sub RemoveAll(Optional Target As MorS = MainG)
@@ -3329,14 +3367,14 @@ Public Function Count(Target As MorS) As Long
         Count = Sub_Groups.Count
     End Select
 End Function
-Public Function Recent_Lot(Optional index As Long = 0, Optional Target As MorS = MainG) As D_LOT
+Public Function Recent_Lot(Optional Index As Long = 0, Optional Target As MorS = MainG) As D_LOT
     Dim Final As Long
     Select Case Target
     Case MainG
-        Final = Main_Groups.Count + index
+        Final = Main_Groups.Count + Index
         Set Recent_Lot = Main_Groups(Final)
     Case SubG
-        Final = Sub_Groups.Count + index
+        Final = Sub_Groups.Count + Index
         Set Recent_Lot = Sub_Groups(Final)
     End Select
 End Function
@@ -3397,9 +3435,9 @@ Public Function Copy() As D_LOT
     End With
     Set Copy = CopiedData
 End Function
-Public Function info(Optional index As Long = 1) As ModelInfo
-    If vLot_info(index) Is Nothing Then Exit Function
-    Set info = vLot_info(index)
+Public Function info(Optional Index As Long = 1) As ModelInfo
+    If vLot_info(Index) Is Nothing Then Exit Function
+    Set info = vLot_info(Index)
 End Function
 
 Private Sub ParseModelinfo()
@@ -3439,11 +3477,11 @@ End Sub
 ### Cleaner.bas
 ````vba
 Sub FolderKiller(ByVal folderDirectory As String)
-    Dim FSO As Object
-    Set FSO = CreateObject("Scripting.FileSystemObject")
+    Dim fso As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
     
-    If FSO.FolderExists(folderDirectory) Then
-        FSO.DeleteFolder folderDirectory, True
+    If fso.FolderExists(folderDirectory) Then
+        fso.DeleteFolder folderDirectory, True
     Else
         Exit Sub
     End If
@@ -3511,15 +3549,14 @@ SkipLoop:
 End Sub
 ' 문서 자동화, 출력까지 한번에 실행하는 Sub
 Public Sub Print_PartList(Optional Handle As Boolean)
-    Dim PLLV As ListView
-    Dim PLitem As listItem
+    Dim PLLV As ListView, PLitem As listItem
     Dim Chkditem As New Collection
     Dim PaperCopies As Long, ListCount As Long, i As Long
     Dim SavedPath As String
     Dim ws As Worksheet
     
     BoW = UI.Brightness
-    If UI.CB_PL_Ddays.value Then DayCount = UI.PL_Ddays_TB.text Else DayCount = 3
+    If UI.CB_PL_Ddays.value Then DayCount = UI.PL_Ddays_TB.text Else DayCount = 4
     Set Brush = New Painter
     
     PaperCopies = CInt(UI.PL_PN_Copies_TB.text)
@@ -3528,7 +3565,7 @@ Public Sub Print_PartList(Optional Handle As Boolean)
 
     For i = 1 To ListCount ' 체크박스 활성화된 아이템 선별
         Set PLitem = PLLV.ListItems.Item(i)
-        If PLitem.Checked Then Chkditem.Add PLitem.index 'SubItems(1)
+        If PLitem.Checked Then Chkditem.Add PLitem.Index 'SubItems(1)
     Next i
     
     If Chkditem.Count < 1 Then MsgBox "선택된 문서 없음": Exit Sub ' 선택된 문서가 없을 시 즉시 종료
@@ -3553,14 +3590,21 @@ UI.UpdateProgressBar UI.PB_BOM, (i - 0.87) / ListCount * 100
         End If
 UI.UpdateProgressBar UI.PB_BOM, (i - 0.73) / ListCount * 100
 '저장을 위해 타이틀 수정
-        Title = "PartList " & PLLV.ListItems.Item(i).text & "_" & wLine
+        Title = "PartList " & PLLV.ListItems.Item(Chkditem(i)).text & "_" & wLine
 UI.UpdateProgressBar UI.PB_BOM, (i - 0.65) / ListCount * 100
 '저장여부 결정
         SavedPath = SaveFilesWithCustomDirectory("PartList", PL_Processing_WB, Printer.PS_PartList(PrintArea), Title, True, False, OriginalKiller.PartList)
 UI.UpdateProgressBar UI.PB_BOM, (i - 0.45) / ListCount * 100
         PLitem.SubItems(4) = "Done" 'PDF
 UI.UpdateProgressBar UI.PB_BOM, (i - 0.35) / ListCount * 100
-        If MRB_PL Then Workbooks.open (SavedPath & ".xlsx") ' 메뉴얼 모드일 때 열기
+        If MRB_PL Then
+            Dim tWB As Workbook, Target As Range
+            Set tWB = Workbooks.open(SavedPath & ".xlsx")  ' 메뉴얼 모드일 때 열기
+            Set Target = tWB.Worksheets(1).Rows(1).Find("-Line", lookAt:=xlPart, LookIn:=xlValues).Offset(1, 1)
+            tWB.Worksheets(1).Activate
+            Target.Select
+            ActiveWindow.FreezePanes = True
+        End If
 'Progress Update
 UI.UpdateProgressBar UI.PB_BOM, i / ListCount * 100
     Next i
@@ -3569,9 +3613,9 @@ UI.UpdateProgressBar UI.PB_BOM, i / ListCount * 100
     
 End Sub
 ' 문서 서식 자동화
-Private Sub AutoReport_PartList(ByRef wb As Workbook)
+Private Sub AutoReport_PartList(ByRef Wb As Workbook)
     ' 초기화 변수
-    Set Target_WorkSheet = wb.Worksheets(1)
+    Set Target_WorkSheet = Wb.Worksheets(1)
     Set vCFR = New Collection
     
     Dim i As Long, DrawingMap As D_Maps  ', LastRow As Long ' DailyPlan 데이터가 있는 마지막 행
@@ -3723,8 +3767,8 @@ End Sub
 Private Function GetPartListWhen(PartListDirectiory As String, Optional ByRef DDC As Long) As String
     ' Excel 애플리케이션을 새로운 인스턴스로 생성
     Dim xlApp As Excel.Application: Set xlApp = New Excel.Application: xlApp.Visible = False
-    Dim wb As Workbook: Set wb = xlApp.Workbooks.open(PartListDirectiory) ' 워크북 열기
-    Dim ws As Worksheet: Set ws = wb.Worksheets(1) ' 워크시트 선택
+    Dim Wb As Workbook: Set Wb = xlApp.Workbooks.open(PartListDirectiory) ' 워크북 열기
+    Dim ws As Worksheet: Set ws = Wb.Worksheets(1) ' 워크시트 선택
     Dim cell As Range, SC As Long, EC As Long, i As Long
         
     Set cell = ws.Rows(1).Find(What:="YYYYMMDD", lookAt:=xlWhole, LookIn:=xlValues) ' PL에서 날짜를 찾는 줄
@@ -3736,7 +3780,7 @@ Private Function GetPartListWhen(PartListDirectiory As String, Optional ByRef DD
     Next i
     UI.PL_Ddays_Counter.Max = DDC
     Title = cell.Offset(1, 0).value ' YYYYMMDD 포맷된 날짜값 인계
-    Title = Mid(Title, 5, 2) & "월-" & Mid(Title, 7, 2) & "일"
+    Title = mid(Title, 5, 2) & "월-" & mid(Title, 7, 2) & "일"
     GetPartListWhen = Title ' 날짜형 제목값 인계
     wLine = ws.Rows(1).Find(What:="Line", lookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0).value ' 라인 값 추출
     SC = ws.Rows(1).Find(What:="잔량", lookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1).Column + 1
@@ -3745,7 +3789,7 @@ Private Function GetPartListWhen(PartListDirectiory As String, Optional ByRef DD
     Set vCFR = New Collection: Set vCFR = PartCollector(cell, CollectionType:=Unique)
     
 NAP:
-    wb.Close SaveChanges:=False: Set wb = Nothing ' 워크북 닫기
+    Wb.Close SaveChanges:=False: Set Wb = Nothing ' 워크북 닫기
     xlApp.Quit: Set xlApp = Nothing ' Excel 애플리케이션 종료
 End Function
 Private Function PartCollector(ByRef PartNamesArea As Range, _
@@ -3822,7 +3866,7 @@ Private Sub Replacing_Parts(ByRef RangeTarget As Range) ' RpP
                  If Not Duplicated Then vVender.Add sVender, sVender ' 중복 아니면 벤더 등록
                  Start_P = Searching + 2: End_P = InStr(Start_P, Target, " [") - 1 ' 다음 파츠 범위 설정
                  If End_P < Start_P Then End_P = Len(Target) ' 마지막 파츠 처리
-                 sParts = Mid$(Target, Start_P, End_P - Start_P + 1) ' 파츠 문자열 추출
+                 sParts = mid$(Target, Start_P, End_P - Start_P + 1) ' 파츠 문자열 추출
                 
                  ' 파츠 추가 또는 병합 처리
                  On Error Resume Next ' 키 중복 오류 방지
@@ -4000,7 +4044,7 @@ End Property
 Private Sub Userform_Terminate()
     AutoReportHandler.Doc_BackColor = pvRGB(1)
     With pvRGB(1)
-        AutoReportHandler.BackColor_TB.BackColor = RGB(.X, .y, .Z)
+        AutoReportHandler.BackColor_TB.BackColor = RGB(.X, .Y, .Z)
     End With
 End Sub
 Private Sub Bright_TB_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
@@ -4138,11 +4182,11 @@ Private Sub BCR_Slidebar_Change()
     Update_Colors
 End Sub
 Private Sub BCG_Slidebar_Change()
-    pvRGB(1).y = BCG_Slidebar.value
-    BCG_TB.text = Format((pvRGB(1).y / 255 * 100), "0.0") & "%"
-    BCG_TB.BackColor = RGB(0, pvRGB(1).y, 0)
-    BCG_Slidebar.SelLength = pvRGB(1).y
-    If pvRGB(1).y < Color_Inversion_Criterion Then
+    pvRGB(1).Y = BCG_Slidebar.value
+    BCG_TB.text = Format((pvRGB(1).Y / 255 * 100), "0.0") & "%"
+    BCG_TB.BackColor = RGB(0, pvRGB(1).Y, 0)
+    BCG_Slidebar.SelLength = pvRGB(1).Y
+    If pvRGB(1).Y < Color_Inversion_Criterion Then
         BCG_TB.ForeColor = RGB(255, 255, 255)
     Else
         BCG_TB.ForeColor = RGB(0, 0, 0)
@@ -4163,7 +4207,7 @@ Private Sub BCB_Slidebar_Change()
 End Sub
 Private Sub Update_Colors()
     With pvRGB(1)
-        Test_TB.BackColor = RGB(.X, .y, .Z)
+        Test_TB.BackColor = RGB(.X, .Y, .Z)
     End With
     Set pvRGB(2) = pvRGB(1).Copy
 End Sub
@@ -4371,8 +4415,8 @@ End Function
 Option Explicit
 
 Private isParsed As Boolean
-Private twb As Workbook, tws As Worksheet
-Private rwb As Workbook, rws As Worksheet
+Private tWB As Workbook, tWS As Worksheet
+Private rWB As Workbook, rWS As Worksheet
 Public Sub Read_Documents(Optional Handle As Boolean = False)
     Dim DPCount As Long, PLCount As Long, MDCount As Long, i As Long, c As Long, Cycle As Long
     Dim vDate(1 To 2) As String, vLine(1 To 2) As String
@@ -4394,14 +4438,14 @@ End Sub
 
 Private Sub SetUp_Targets(ByRef Target_WorkBook As Workbook, ByRef Target_WorkSheet As Worksheet, _
                             ByRef Reference_WorkBook As Workbook, ByRef Reference_WorkSheet As Worksheet)
-    Set twb = Target_WorkBook: Set tws = Target_WorkSheet: Set rwb = Reference_WorkBook: Set rws = Reference_WorkSheet
+    Set tWB = Target_WorkBook: Set tWS = Target_WorkSheet: Set rWB = Reference_WorkBook: Set rWS = Reference_WorkSheet
 End Sub
                             
 Private Sub Parse_wbwsPointer()
     Dim Linked(1 To 4) As Boolean
-    Linked(1) = Not twb Is Nothing: Linked(2) = Not tws Is Nothing: Linked(3) = Not rwb Is Nothing: Linked(4) = Not rws Is Nothing
+    Linked(1) = Not tWB Is Nothing: Linked(2) = Not tWS Is Nothing: Linked(3) = Not rWB Is Nothing: Linked(4) = Not rWS Is Nothing
     If Linked(1) And Linked(2) And Linked(3) And Linked(4) Then Exit Sub
-    Set twb = Nothing: Set tws = Nothing: Set rwb = Nothing: Set rws = Nothing
+    Set tWB = Nothing: Set tWS = Nothing: Set rWB = Nothing: Set rWS = Nothing
     
     isParsed = True ' Parsing Boolean
 End Sub
@@ -4423,7 +4467,7 @@ Option Explicit
 Public Sub MergeDateTime_Flexible(ByRef ws As Worksheet, _
                                   ByVal dateCol As Long, ByVal targetCol As Long, _
                                   Optional ByVal timeCol As Long = 0, _
-                                  Optional ByVal StartRow As Long = 2, _
+                                  Optional ByVal startRow As Long = 2, _
                                   Optional ByVal TargetHeader As String = "Input Time", _
                                   Optional ByVal Formatting As String = "hh:mm")
 
@@ -4438,9 +4482,9 @@ Public Sub MergeDateTime_Flexible(ByRef ws As Worksheet, _
 
     ' 기준 열(날짜 혹은 혼합) 마지막 행
     LastRow = ws.Cells(ws.Rows.Count, dateCol).End(xlUp).Row
-    If LastRow < StartRow Then GoTo CleanExit ' 데이터 없음
+    If LastRow < startRow Then GoTo CleanExit ' 데이터 없음
 
-    For r = StartRow To LastRow
+    For r = startRow To LastRow
         vD = ws.Cells(r, dateCol).value2
         If timeCol > 0 Then
             vT = ws.Cells(r, timeCol).value2
@@ -4456,8 +4500,8 @@ Public Sub MergeDateTime_Flexible(ByRef ws As Worksheet, _
     Next r
 
     ' 표시 형식(값은 Date 그대로 유지)
-    ws.Range(ws.Cells(StartRow, targetCol), ws.Cells(LastRow, targetCol)).NumberFormat = Formatting
-    ws.Cells(StartRow - 1, targetCol).value = TargetHeader
+    ws.Range(ws.Cells(startRow, targetCol), ws.Cells(LastRow, targetCol)).NumberFormat = Formatting
+    ws.Cells(startRow - 1, targetCol).value = TargetHeader
 
 CleanExit:
     Application.EnableEvents = True
@@ -4496,7 +4540,7 @@ Private Function TryParseDateTimeFlex(ByVal vDate As Variant, ByVal vTime As Var
     End If
 
     ' 2) 텍스트인 경우 처리 (오전/오후, AM/PM, YYYYMMDD, hhmmss 등)
-    Dim s As String, sNorm As String, y As Long, m As Long, d As Long
+    Dim s As String, sNorm As String, Y As Long, m As Long, d As Long
     s = Trim$(CStr(vDate))
     If Len(s) = 0 Then Exit Function
 
@@ -4527,7 +4571,7 @@ End Function
 
 ' YYYYMMDD(숫자/텍스트) → Date (시간 00:00)
 Private Function TryParseYmd8_ToDate(ByVal v As Variant, ByRef outDate As Date) As Boolean
-    Dim n As Long, y As Long, m As Long, d As Long
+    Dim n As Long, Y As Long, m As Long, d As Long
     Dim s As String
 
     TryParseYmd8_ToDate = False
@@ -4536,28 +4580,28 @@ Private Function TryParseYmd8_ToDate(ByVal v As Variant, ByRef outDate As Date) 
     If isNumeric(v) Then
         n = CLng(v)
         If n <= 0 Then Exit Function
-        y = n \ 10000
+        Y = n \ 10000
         m = (n \ 100) Mod 100
         d = n Mod 100
     Else
         s = Trim$(CStr(v))
         If Len(s) <> 8 Then Exit Function
         If Not isNumeric(s) Then Exit Function
-        y = CLng(Left$(s, 4))
-        m = CLng(Mid$(s, 5, 2))
+        Y = CLng(Left$(s, 4))
+        m = CLng(mid$(s, 5, 2))
         d = CLng(Right$(s, 2))
     End If
 
-    If y < 1900 Or m < 1 Or m > 12 Or d < 1 Or d > 31 Then Exit Function
+    If Y < 1900 Or m < 1 Or m > 12 Or d < 1 Or d > 31 Then Exit Function
 
-    outDate = DateSerial(y, m, d)
+    outDate = DateSerial(Y, m, d)
     TryParseYmd8_ToDate = True
 End Function
 
 ' 혼합 텍스트에서 "YYYYMMDD [오전/오후|AM/PM] hh:mm[:ss]" 패턴 처리
 ' 예: "20250831 오전 08:00:00", "20250831 8:00", "20250831 PM 8:00"
 Private Function TryParse_Ymd8_And_TimeText(ByVal s As String, ByRef outDT As Date) As Boolean
-    Dim sTrim As String, y As Long, m As Long, d As Long
+    Dim sTrim As String, Y As Long, m As Long, d As Long
     Dim datePart As String, timePart As String, posSp As Long
     Dim baseDate As Date, tfrac As Double
 
@@ -4571,7 +4615,7 @@ Private Function TryParse_Ymd8_And_TimeText(ByVal s As String, ByRef outDT As Da
     If Not TryParseYmd8_ToDate(datePart, baseDate) Then Exit Function
 
     ' 뒤쪽에서 시간부분 추출(있을 수도, 없을 수도)
-    timePart = Mid$(sTrim, 9) ' 9번째 이후
+    timePart = mid$(sTrim, 9) ' 9번째 이후
     timePart = Trim$(timePart)
 
     If Len(timePart) = 0 Then
@@ -4624,7 +4668,7 @@ Private Function TryGetTimeFraction_Flex(ByVal v As Variant, ByRef outFrac As Do
     ElseIf Len(sNorm) = 6 And isNumeric(sNorm) Then
         ' "hhmmss"
         hh = CLng(Left$(sNorm, 2))
-        nn = CLng(Mid$(sNorm, 3, 2))
+        nn = CLng(mid$(sNorm, 3, 2))
         ss = CLng(Right$(sNorm, 2))
         If hh >= 0 And hh <= 23 And nn >= 0 And nn <= 59 And ss >= 0 And ss <= 59 Then
             outFrac = TimeSerial(hh, nn, ss)
@@ -4812,7 +4856,7 @@ Public Type MDToken
     Day As Integer
     LineAddr As String         ' 예: "C11"
     fullPath As String         ' 원본 경로
-    FileName As String         ' 파일명만
+    fileName As String         ' 파일명만
     DateValue As Date          ' BaseYear 적용된 실제 Date
     WeekdayVb As VbDayOfWeek   ' vbMonday 등
     WeekdayK As String         ' "월","화","수" ...
@@ -4868,16 +4912,16 @@ Public Enum ObjDirection4Way
 End Enum
 
 Public Function SaveFilesWithCustomDirectory(directoryPath As String, _
-                ByRef wb As Workbook, _
+                ByRef Wb As Workbook, _
                 ByRef PDFpagesetup As PrintSetting, _
                 Optional ByRef vTitle As String = "UndefinedFile", _
                 Optional SaveToXlsx As Boolean = False, _
                 Optional SaveToPDF As Boolean = True, _
                 Optional OriginalKiller As Boolean = True) As String
     On Error Resume Next
-    Dim ws As Worksheet: Set ws = wb.Worksheets(1)
+    Dim ws As Worksheet: Set ws = Wb.Worksheets(1)
     Dim ExcelPath As String, savePath As String, ToDeleteDir As String
-    ExcelPath = ThisWorkbook.Path: ToDeleteDir = wb.FullName
+    ExcelPath = ThisWorkbook.Path: ToDeleteDir = Wb.FullName
 '주소가 없으면 생성
     If Dir(ExcelPath & "\" & directoryPath, vbDirectory) = "" Then MkDir ExcelPath & "\" & directoryPath
 '파일 저장용 주소 생성
@@ -4889,7 +4933,7 @@ Public Function SaveFilesWithCustomDirectory(directoryPath As String, _
     AutoPageSetup ws, PDFpagesetup
     If SaveToPDF Then ws.PrintOut ActivePrinter:="Microsoft Print to PDF", PrintToFile:=True, prtofilename:=savePath & ".pdf"
 '엑셀로 저장할지 결정
-    If SaveToXlsx Then wb.Close SaveChanges:=True, FileName:=savePath Else wb.Close SaveChanges:=False
+    If SaveToXlsx Then Wb.Close SaveChanges:=True, fileName:=savePath Else Wb.Close SaveChanges:=False
     If OriginalKiller Then Kill ToDeleteDir
     SaveFilesWithCustomDirectory = savePath
     On Error GoTo 0
@@ -4897,21 +4941,21 @@ End Function
 
 Function FindFilesWithTextInName(directoryPath As String, searchText As String, _
                                         Optional FileExtForSort As String) As Collection
-    Dim FileName As String, filePath As String, FEFS As Long
+    Dim fileName As String, filePath As String, FEFS As Long
     Dim resultPaths As New Collection
     
-    FileName = Dir(directoryPath & "\*.*") ' 지정된 디렉토리에서 파일 목록 얻기
+    fileName = Dir(directoryPath & "\*.*") ' 지정된 디렉토리에서 파일 목록 얻기
     ' 파일 목록을 확인하면서 조건에 맞는 파일 찾기
-    Do While FileName <> ""
+    Do While fileName <> ""
         ' 파일 이름에 특정 텍스트가 포함되어 있는지 확인
-        FEFS = IIf(FileExtForSort = "", 1, InStr(1, FileName, FileExtForSort, vbBinaryCompare))
-        If InStr(1, FileName, searchText, vbTextCompare) > 0 And FEFS > 0 Then
+        FEFS = IIf(FileExtForSort = "", 1, InStr(1, fileName, FileExtForSort, vbBinaryCompare))
+        If InStr(1, fileName, searchText, vbTextCompare) > 0 And FEFS > 0 Then
             ' 조건에 맞는 파일의 경로를 생성
-            filePath = directoryPath & "\" & FileName
+            filePath = directoryPath & "\" & fileName
             ' 조건에 맞는 파일의 경로를 리스트에 추가
             resultPaths.Add filePath
         End If
-        FileName = Dir ' 다음 파일 검색
+        fileName = Dir ' 다음 파일 검색
     Loop
     
     ' 조건에 맞는 파일이 하나 이상인 경우 리스트 반환
@@ -5090,18 +5134,32 @@ Public Sub SelfMerge(ByRef MergeTarget As Range)
 End Sub
 
 Public Function ExtractBracketValue(ByVal Txt As String, Optional ByRef Searching As Long = 1) As String
+    Txt = Trim(CStr(Txt)) ' 자동교정
     Dim sPos As Long, ePos As Long
     sPos = InStr(Searching, Txt, "["): ePos = InStr(Searching + 1, Txt, "]")
     
     If sPos > 0 And ePos > sPos Then
-        ExtractBracketValue = Mid(Txt, sPos + 1, ePos - sPos - 1)
+        ExtractBracketValue = mid(Txt, sPos + 1, ePos - sPos - 1)
     Else
         ExtractBracketValue = ""
     End If
     Searching = ePos
 End Function
 
-Public Sub DeleteDuplicateRowsInColumn(ByVal targetCol As Long, ByRef StartRow As Long, ByRef EndRow As Long, _
+Public Function ExtractSmallBracketValue(ByVal Txt As String, Optional ByRef Searching As Long = 1) As String
+    Txt = Trim(CStr(Txt)) ' 자동교정
+    Dim sPos As Long, ePos As Long
+    sPos = InStr(Searching, Txt, "("): ePos = InStr(Searching + 1, Txt, ")")
+    
+    If sPos > 0 And ePos > sPos Then
+        ExtractSmallBracketValue = mid(Txt, sPos + 1, ePos - sPos - 1)
+    Else
+        ExtractSmallBracketValue = ""
+    End If
+    Searching = ePos
+End Function
+
+Public Sub DeleteDuplicateRowsInColumn(ByVal targetCol As Long, ByRef startRow As Long, ByRef EndRow As Long, _
         Optional ByRef tgtWs As Worksheet)
 
     Dim colValues As New Collection   ' 중복 체크용 컬렉션
@@ -5111,7 +5169,7 @@ Public Sub DeleteDuplicateRowsInColumn(ByVal targetCol As Long, ByRef StartRow A
     If tgtWs Is Nothing Then Set tgtWs = ActiveSheet ' 범용성 확보
 
     ' 아래에서 위로 순회하면서 중복 검사 및 삭제
-    For i = EndRow To StartRow Step -1
+    For i = EndRow To startRow Step -1
         ' 지정된 컬럼의 값을 가져와 공백 제거
         cellVal = Trim$(tgtWs.Cells(i, targetCol).value)
 
@@ -5119,7 +5177,7 @@ Public Sub DeleteDuplicateRowsInColumn(ByVal targetCol As Long, ByRef StartRow A
         If Len(cellVal) > 0 Then
             On Error Resume Next
             ' 키로 cellVal을 지정하여 컬렉션에 추가 시도
-            colValues.Add Item:=cellVal, key:=cellVal
+            colValues.Add Item:=cellVal, Key:=cellVal
 
             ' 오류 번호 457: 이미 동일한 Key가 존재함을 의미
             If Err.Number = 457 Then
@@ -5175,12 +5233,12 @@ End Function
 '---------------------------
 Private Function ParseMDToken(ByVal fullPath As String, Optional ByVal BaseYear As Long = 0) As MDToken
     Dim t As MDToken, nm As String
-    Dim ms As String, ds As String, ln As String, dt As Date, y As Long
+    Dim ms As String, ds As String, ln As String, dt As Date, Y As Long
    
-    nm = Mid$(fullPath, InStrRev(fullPath, "\") + 1)
+    nm = mid$(fullPath, InStrRev(fullPath, "\") + 1)
     nm = Replace$(nm, ".xlsx", "", , , vbTextCompare)
     t.fullPath = fullPath
-    t.FileName = nm
+    t.fileName = nm
    
     ' 문서타입
     If InStr(1, nm, "DailyPlan", vbTextCompare) > 0 Then
@@ -5204,14 +5262,14 @@ Private Function ParseMDToken(ByVal fullPath As String, Optional ByVal BaseYear 
    
     ' 연도
     If BaseYear = 0 Then
-        y = Year(Date) ' 기본 현재 연도
+        Y = Year(Date) ' 기본 현재 연도
     Else
-        y = BaseYear
+        Y = BaseYear
     End If
    
     If t.Month >= 1 And t.Day >= 1 Then
         On Error Resume Next
-        dt = DateSerial(y, t.Month, t.Day)
+        dt = DateSerial(Y, t.Month, t.Day)
         On Error GoTo 0
         If dt > 0 Then
             t.DateValue = dt
@@ -5281,7 +5339,7 @@ End Sub
 '---------------------------------------------
 Public Function GetFoundSentences(ByVal Search As String, ByVal Target As String) As String
     Dim nm As String, ms As String, ds As String, ln As String
-    nm = Mid$(Target, InStrRev(Target, "\") + 1)
+    nm = mid$(Target, InStrRev(Target, "\") + 1)
     nm = Replace$(nm, ".xlsx", "", , , vbTextCompare)
    
     If InStr(1, Search, "월", vbTextCompare) > 0 Then
@@ -5307,9 +5365,9 @@ End Function
 '--- 날짜/라인 키 빌드: 파일명 예) "DailyPlan 5월-28일_C11.xlsx"
 Private Function BuildKeyFromPath(ByVal fullPath As String, Optional ByVal BaseYear As Long = 0) As String
     Dim nm As String, m As String, d As String, ln As String
-    Dim y As Long, dt As Date
+    Dim Y As Long, dt As Date
    
-    nm = Mid$(fullPath, InStrRev(fullPath, "\") + 1)
+    nm = mid$(fullPath, InStrRev(fullPath, "\") + 1)
     nm = Replace$(nm, ".xlsx", "", , , vbTextCompare)
    
     m = RxFirst("([0-9]{1,2})(?=월)", nm)
@@ -5321,9 +5379,9 @@ Private Function BuildKeyFromPath(ByVal fullPath As String, Optional ByVal BaseY
         Exit Function
     End If
    
-    If BaseYear = 0 Then y = Year(Date) Else y = BaseYear
+    If BaseYear = 0 Then Y = Year(Date) Else Y = BaseYear
     On Error Resume Next
-    dt = DateSerial(y, CLng(m), CLng(d))
+    dt = DateSerial(Y, CLng(m), CLng(d))
     On Error GoTo 0
     If dt = 0 Then
         BuildKeyFromPath = vbNullString
@@ -5340,7 +5398,7 @@ Public Sub FillListView_Intersection(ByRef filesA As Collection, ByRef filesB As
                                             Optional ByVal A_Discription As String, Optional ByVal B_Discription As String, Optional ByVal C_Discription As String, Optional ByVal D_Discription As String)
     Dim i As Long
     Dim keyMap As New Collection         ' Key 전용 Map (Collection을 Map처럼 사용)
-    Dim itemA As String, itemB As String, key As String
+    Dim itemA As String, itemB As String, Key As String
     Dim it As listItem
     If A_Discription = "" Then A_Discription = "A경로": If B_Discription = "" Then B_Discription = "B경로"
     If C_Discription = "" Then C_Discription = "C경로": If D_Discription = "" Then D_Discription = "D경로"
@@ -5358,10 +5416,10 @@ Public Sub FillListView_Intersection(ByRef filesA As Collection, ByRef filesB As
     ' 1) A집합 Key 적재 (Key 충돌은 무시)
     For i = 1 To filesA.Count
         itemA = CStr(filesA(i))
-        key = BuildKeyFromPath(itemA, BaseYear)
-        If Len(key) > 0 Then
+        Key = BuildKeyFromPath(itemA, BaseYear)
+        If Len(Key) > 0 Then
             On Error Resume Next
-                keyMap.Add itemA, key     ' Item=원본경로, Key=정규화키
+                keyMap.Add itemA, Key     ' Item=원본경로, Key=정규화키
                 ' 이미 존재하면 Err=457 -> 최초 한 개만 보관(존재성 체크가 목적)
                 Err.Clear
             On Error GoTo 0
@@ -5371,17 +5429,17 @@ Public Sub FillListView_Intersection(ByRef filesA As Collection, ByRef filesB As
     ' 2) B를 순회하며 교집합만 출력
     For i = 1 To filesB.Count
         itemB = CStr(filesB(i))
-        key = BuildKeyFromPath(itemB, BaseYear)
-        If Len(key) = 0 Then GoTo CONT_NEXT
+        Key = BuildKeyFromPath(itemB, BaseYear)
+        If Len(Key) = 0 Then GoTo CONT_NEXT
        
         ' 존재성 검사: col.Item(key) → 에러 없으면 존재
         Dim aPath As String, dtText As String, lnText As String
         On Error Resume Next
-            aPath = CStr(keyMap.Item(key))   ' 없으면 에러
+            aPath = CStr(keyMap.Item(Key))   ' 없으면 에러
         If Err.Number = 0 Then
             ' 키에서 표시용 날짜/라인 분리
-            dtText = Split(key, "|")(0)      ' yyyy-mm-dd
-            lnText = Split(key, "|")(1)      ' C##
+            dtText = Split(Key, "|")(0)      ' yyyy-mm-dd
+            lnText = Split(Key, "|")(1)      ' C##
             With outLV
                 Set it = .ListItems.Add(, , Format$(CDate(dtText), "m월-d일"))
                 it.SubItems(1) = lnText
@@ -5404,7 +5462,7 @@ Public Function LenA(ByVal Expression As String, _
     Dim w As Single, i As Long, code As Long, n As Long: n = Len(Expression)
     If n = 0 Then LenA = 0: Exit Function
     For i = 1 To n
-        code = AscW(Mid$(Expression, i, 1)) ' Mid$ 사용: Variant 방지 + 약간 더 빠름
+        code = AscW(mid$(Expression, i, 1)) ' Mid$ 사용: Variant 방지 + 약간 더 빠름
         If code >= &HAC00 And code <= &HD7A3 Then w = w + Achr Else w = w + Achr * LatinScale ' 가(AC00=44032) ~ 힣(D7A3=55203)
     Next i
     LenA = w  ' Single 그대로 반환 (소수점 유지)
@@ -5453,11 +5511,12 @@ End Sub
 Private Function FileExists(ByVal f As String) As Boolean
     FileExists = (Len(Dir$(f, vbNormal)) > 0)
 End Function
-
 ````
 
 ### AB_ContorlApps.bas
 ````vba
+
+
 ````
 
 ### Z_Directory.bas
@@ -5469,7 +5528,6 @@ Private Const DvFD As String = "Feeder"
 Private Const DvMD As String = "MultiDocuments"
 Private Const DvBackup As String = "Backup"
 Private Const DvDev As String = "A_Develop"
-Private Workbook_Folder As String
 Private SourceFileFolder_Directory As String
 
 Private ws As Worksheet
@@ -5477,31 +5535,30 @@ Public isDirSetUp As Boolean
 
 Public Sub SetUpDirectories()
     Set ws = ThisWorkbook.Worksheets("Setting")
-    Workbook_Folder = Replace(ThisWorkbook.FullName, ThisWorkbook.Name, "")
     SourceFileFolder_Directory = ws.Columns(1).Find(What:="Source", lookAt:=xlWhole).Offset(0, 1).value
     isDirSetUp = True
 End Sub
 
 Public Property Get BOM() As String
-    BOM = Workbook_Folder & DvBOM
+    BOM = ThisWorkbook.Path & DvBOM
 End Property
 Public Property Get DailyPlan() As String
-    DailyPlan = Workbook_Folder & DvDP
+    DailyPlan = ThisWorkbook.Path & DvDP
 End Property
 Public Property Get PartList() As String
-    PartList = Workbook_Folder & DvPL
+    PartList = ThisWorkbook.Path & DvPL
 End Property
 Public Property Get Feeder() As String
-    Feeder = Workbook_Folder & DvFD
+    Feeder = ThisWorkbook.Path & DvFD
 End Property
 Public Property Get MultiDocuments() As String
-    MultiDocuments = Workbook_Folder & DvMD
+    MultiDocuments = ThisWorkbook.Path & DvMD
 End Property
 Public Property Get Backup() As String
-    Backup = Workbook_Folder & DvBackup
+    Backup = ThisWorkbook.Path & DvBackup
 End Property
 Public Property Get Develop() As String
-    Develop = Workbook_Folder & DvDev
+    Develop = ThisWorkbook.Path & DvDev
 End Property
 Public Property Get Source() As String
     Source = SourceFileFolder_Directory
@@ -5515,5 +5572,566 @@ End Property
 ### Git_Kit.bas
 ````vba
 Option Explicit
+````
+
+### itemUnit.cls
+````vba
+Option Explicit
+'==========================================================
+' Class: itemUnit (간소화 버전)
+' - 아이템 메타정보(Nick/Vender/PartNumber/QTY)
+' - 월/일 기준 카운터: CountPerDay(Key As Variant)
+'   * Key = Date  -> 해당 날짜(MM-DD)에 대응하는 슬롯
+'   * Key = Long  -> 내부 인덱스(1~372 = 12*31) 직접 접근
+'==========================================================
+
+'----------------------------------------
+' [기본 필드: 메타정보]
+'----------------------------------------
+Private vID As String
+Private vNick As String
+Private vVender As String
+Private vPartNumber As String
+Private vQTY As Long
+
+'----------------------------------------
+' [월일 카운터]
+' - 12개월 * 31일 = 372칸 고정
+' - Index = (Month(d) - 1) * 31 + Day(d)
+'----------------------------------------
+Private mCounts(1 To 372) As Long
+
+'==========================================================
+' 1) 메타정보: ID 생성 및 프로퍼티
+'==========================================================
+Public Property Get ID_Hash() As String
+    ID_Hash = vID          ' 읽기 전용
+End Property
+
+Public Property Get NickName() As String
+    NickName = vNick
+End Property
+
+Public Property Let NickName(ByVal Target As String)
+    vNick = Target
+    MakeID
+End Property
+
+Public Property Get Vender() As String
+    Vender = vVender
+End Property
+
+Public Property Let Vender(ByVal Target As String)
+    vVender = Target
+    MakeID
+End Property
+
+Public Property Get PartNumber() As String
+    PartNumber = vPartNumber
+End Property
+
+Public Property Let PartNumber(ByVal Target As String)
+    vPartNumber = Target
+    MakeID
+End Property
+
+Public Property Get QTY() As Long
+    QTY = vQTY
+End Property
+
+Public Property Let QTY(ByVal Target As Long)
+    vQTY = Target
+End Property
+
+' ID = Nick_Vender_PartNumber (세 필드가 모두 있을 때만)
+Private Sub MakeID()
+    If Len(vNick) > 0 And Len(vVender) > 0 And Len(vPartNumber) > 0 Then
+        vID = vVender & "_" & vNick & "_" & vPartNumber
+    End If
+End Sub
+
+'==========================================================
+' 2) 수명/상태 관리
+'==========================================================
+Public Sub Clear()
+    Dim i As Long
+    For i = LBound(mCounts) To UBound(mCounts)
+        mCounts(i) = 0
+    Next i
+End Sub
+
+' 필요하면 형식 유지용
+Public Sub Init()
+    Clear
+End Sub
+
+'==========================================================
+' 3) 내부 유틸리티 (인덱스 변환/검사)
+'==========================================================
+' Date -> 월일 인덱스(1~372) 변환
+Private Function MDIndexFromDate(ByVal d As Date) As Long
+    Dim m As Long, dy As Long, idx As Long
+
+    m = Month(d)
+    dy = Day(d)
+
+    If m < 1 Or m > 12 Or dy < 1 Or dy > 31 Then
+        Err.Raise 13, TypeName(Me) & ".MDIndexFromDate", "유효하지 않은 날짜입니다."
+    End If
+
+    idx = (m - 1) * 31 + dy          ' 1 ~ 372
+    MDIndexFromDate = idx
+End Function
+
+Private Sub CheckIndex(ByVal idx As Long)
+    If idx < LBound(mCounts) Or idx > UBound(mCounts) Then
+        Err.Raise 9, TypeName(Me) & ".CheckIndex", "인덱스 범위를 벗어났습니다.(1~372)"
+    End If
+End Sub
+
+'==========================================================
+' 4) 핵심 인덱서: CountPerDay
+'    - Key As Variant: Date 또는 Long(1~372)
+'==========================================================
+Public Property Get CountPerDay(ByVal Key As Variant) As Long
+    Dim idx As Long
+
+    If VarType(Key) = vbDate Then
+        idx = MDIndexFromDate(CDate(Key))
+    ElseIf isNumeric(Key) Then
+        idx = CLng(Key)
+    Else
+        Err.Raise 13, TypeName(Me) & ".CountPerDay.Get", _
+                    "Key는 Date 또는 Long(1~372) 이어야 합니다."
+    End If
+
+    CheckIndex idx
+    CountPerDay = mCounts(idx)
+End Property
+
+Public Property Let CountPerDay(ByVal Key As Variant, ByVal value As Long)
+    Dim idx As Long
+
+    If VarType(Key) = vbDate Then
+        idx = MDIndexFromDate(CDate(Key))
+    ElseIf isNumeric(Key) Then
+        idx = CLng(Key)
+    Else
+        Err.Raise 13, TypeName(Me) & ".CountPerDay.Let", _
+                    "Key는 Date 또는 Long(1~372) 이어야 합니다."
+    End If
+
+    CheckIndex idx
+    mCounts(idx) = value
+End Property
+
+Public Property Get SumCount() As Long
+    Dim i As Long, Result As Long
+    For i = LBound(mCounts) To UBound(mCounts)
+        Result = Result + mCounts(i)
+    Next i
+    SumCount = Result
+End Property
+
+Public Function Copy() As itemUnit
+    Dim Copied As New itemUnit, i As Long
+    With Copied
+        .NickName = vNick
+        .PartNumber = vPartNumber
+        .Vender = vVender
+        For i = 1 To 372
+            .CountPerDay(i) = mCounts(i)
+        Next i
+    End With
+    Set Copy = Copied
+End Function
+````
+
+### CA_itemCounter.bas
+````vba
+Option Explicit
+
+'==== 모듈 전역 변수 (기존 유지) ===============================================
+Private xlApp As Excel.Application, xlAppSub As Excel.Application
+Private cNickname As Long, cVender As Long, cPartNumber As Long, cSC As Long, cDD As Long
+Private cLC As Long, cLS As Long, cLE As Long
+Private cDC As Long, cDS As Long, cDE As Long
+Private cTC As Long, cTS As Long, cTE As Long
+Private cFC As Long, cFS As Long, cFE As Long
+Private rStart As Long, rEnd As Long, rTitle As Long
+Private tWB As Workbook, tWS As Worksheet, rWB As Workbook, rWS As Worksheet
+Public Sub Test_CAIC()
+    Dim Temp As New Collection, i As Long
+    Set Temp = ReclassifingVNQ("[ABCD] 1234/5678(2)/9012(4)/3456(3) [EFGH] 9876(3)/5431", "Controller")
+    For i = 1 To Temp.Count
+        Dim iUTemp As New itemUnit
+        Set iUTemp = Temp(i)
+        Debug.Print "ID_Hash : " & iUTemp.ID_Hash
+        Debug.Print "QTY : " & iUTemp.QTY
+    Next i
+End Sub
+Public Sub testA()
+    PL2IC "D:\Downloads\공급문서\AutoReport\PartList\PartList 10월-31일_C11.xlsx"
+    
+    Debug.Print "Target WorkBook : " & tWB.Name
+    Debug.Print "Target WorkSheet : " & tWS.Name
+    Debug.Print "Reference WorkBook : " & rWB.Name
+    Debug.Print "Reference WorkSheet : " & rWS.Name
+    'PL2DP
+End Sub
+Public Sub testPLiReader()
+    Get_Reference "D:\Downloads\공급문서\AutoReport\PartList\PartList 11월-14일_C11.xlsx"
+    Dim Temp As New Collection, Target As New itemUnit, i As Long
+    Set Temp = PLitemReader(8, 10, 2, 52)
+    For i = 1 To Temp.Count
+        Set Target = Temp(i)
+        Debug.Print Target.ID_Hash & " : " & Target.QTY & " = " & Target.CountPerDay(CDate("2025-11-14"))
+    Next i
+End Sub
+Public Sub ReActive()
+    Dim asdf As Workbook
+    Set asdf = GetObject(ThisWorkbook.FullName)
+    asdf.Application.Visible = True
+End Sub
+
+'==== 퍼블릭 API ================================================================
+Public Sub PL2DP(ByVal DailyPlan_Directory As String, ByVal PartList_Directory As String)
+    Set_Target DailyPlan_Directory
+    Get_Reference PartList_Directory
+    ' TODO: 구현 예정
+End Sub
+
+Public Sub PL2IC(ByVal PartList_Directory As String)
+    Set_Target ThisWorkbook.FullName, "itemCounter"
+    Get_Reference PartList_Directory
+    
+    Dim cNickname As Long, cVender As Long, cPartNumber As Long, cSC As Long, cDD(0 To 4) As Long
+    Dim cLC As Long, cLS As Long, cLE As Long ' Columns Line Cart, Line Set, Line Each
+    Dim cDC As Long, cDS As Long, cDE As Long ' Columns Depot Cart, Depot Set, Depot Each
+    Dim cTC As Long, cTS As Long, cTE As Long ' Columns Total Cart, Total Set, Total Each
+    Dim cFC As Long, cFS As Long, cFE As Long ' Columns Fire Cart, Fire Set, Fire Each
+    Dim rStart(0 To 1) As Long, rEnd(0 To 1) As Long, rTitle(0 To 1) As Long ' Rows Start, End, Title // 0:Reference, 1:Target
+    Dim cStart(0 To 1) As Long, cEnd(0 To 1) As Long ' Columns Start, End // 0:Reference, 1:Target
+    Dim rR As Range, tR As Range, i As Long
+    Dim tiu As New itemUnit, Each_items As New Collection
+    
+    Set rR = rWS.Rows(1).Find("-Line", lookAt:=xlPart, LookIn:=xlValues)
+    Set tR = tWS.Cells.Find("Setting", lookAt:=xlWhole, LookIn:=xlValues)
+    ' Columns Number
+    cNickname = tR.Column
+    cVender = tR.Column + 1
+    cPartNumber = tR.Column + 2
+    cSC = tR.Column + 3
+    For i = 0 To 4
+        cDD(i) = cSC + i + 1
+    Next i
+    cLC = cDD(4) + 1
+    cLS = cDD(4) + 2
+    cLE = cDD(4) + 3
+    cDC = cDD(4) + 4
+    cDS = cDD(4) + 5
+    cDE = cDD(4) + 6
+    cTC = cDD(4) + 7
+    cTS = cDD(4) + 8
+    cTE = cDD(4) + 9
+    cFC = cDD(4) + 10
+    cFS = cDD(4) + 11
+    cFE = cDD(4) + 12
+    ' Rows Number
+    rStart(1) = tR.Row + 3
+    rEnd(1) = tWS.Cells(tWS.Rows.Count, cNickname).End(xlUp).Row
+    cStart(1) = tR.Column
+    cEnd(1) = tWS.Cells(rStart(1), tWS.Columns.Count).End(xlToLeft).Column
+    rTitle(0) = rR.Row
+    rStart(0) = rTitle(0) + 1
+    rEnd(0) = rWS.Cells(rWS.Rows.Count, 1).End(xlUp).Row
+    cStart(0) = rR.Column + 2
+    cEnd(0) = rWS.Cells(1, rWS.Columns.Count).End(xlToLeft).Column
+    
+    Set Each_items = PLitemReader(cStart(0), cEnd(0), rStart(0), rEnd(0)) ' 읽기
+    ' 쓰기
+    TempKiller Each_items ' 날리기
+    
+End Sub
+Private Function PLitemReader(cS As Long, cE As Long, rS As Long, rE As Long) As Collection
+    Dim Result As New Collection, Temp As Collection
+    Dim Tpitem As itemUnit, Rpitem As itemUnit
+    Dim i As Long, n As Long, r As Long, c As Long
+    Dim CountCol As Long, DayCol As Long, RowCount As Long
+    Dim RawValue As String, PartsNickName As String
+    Dim dKey As Date
+    Dim Duplicated As Boolean
+
+    ' 날짜/수량 열 찾기
+    DayCol = rWS.Rows(1).Find("투입" & vbLf & "시점", lookAt:=xlPart, LookIn:=xlValues).Column
+    CountCol = rWS.Rows(1).Find("수량", lookAt:=xlPart, LookIn:=xlValues).Column
+
+    For c = cS To cE          ' 열 순회
+        PartsNickName = CStr(rWS.Cells(1, c).value) ' 파트 닉네임
+
+        For r = rS To rE      ' 행 순회
+            RawValue = Trim$(CStr(rWS.Cells(r, c).value))
+            If Len(RawValue) = 0 Then GoTo ContinueRow   ' 빈 셀은 스킵
+
+            ' 날짜/수량 읽기
+            If IsDate(rWS.Cells(r, DayCol).value) Then
+                dKey = CDate(rWS.Cells(r, DayCol).value)
+            Else
+                GoTo ContinueRow   ' 날짜 없으면 스킵(원하시면 에러 처리로 변경 가능)
+            End If
+
+            If isNumeric(rWS.Cells(r, CountCol).value) Then
+                RowCount = CLng(rWS.Cells(r, CountCol).value)
+            Else
+                RowCount = 0
+            End If
+            If RowCount = 0 Then GoTo ContinueRow
+
+            ' 셀값 → itemUnit 컬렉션
+            Set Temp = ReclassifingVNQ(RawValue, PartsNickName)
+
+            For i = 1 To Temp.Count
+                Set Tpitem = Temp(i)
+
+                '-----------------------------
+                ' 1) Result에서 같은 ID 찾기
+                '-----------------------------
+                Set Rpitem = Nothing
+                Duplicated = False
+
+                For n = 1 To Result.Count
+                    Set Rpitem = Result(n)
+                    If Rpitem.ID_Hash = Tpitem.ID_Hash Then
+                        Duplicated = True
+                        Exit For
+                    End If
+                Next n
+
+                '-----------------------------
+                ' 2) 없으면 새로 추가
+                '-----------------------------
+                If Not Duplicated Then
+                    ' 그대로 참조해도 되고, 안전하게 복사본을 쓰고 싶으면 Tpitem.Copy
+                    Set Rpitem = Tpitem.Copy
+                    Result.Add Rpitem
+                End If
+
+                '-----------------------------
+                ' 3) 월일 기준 카운트 누적
+                '   CountPerDay(dKey)는 내부에서 월/일만 보고 저장
+                '   RowCount(행의 수량) * Tpitem.QTY(파트당 필요 수량)
+                '-----------------------------
+                Rpitem.CountPerDay(dKey) = Rpitem.CountPerDay(dKey) + (RowCount * Tpitem.QTY)
+            Next i
+
+ContinueRow:
+        Next r
+    Next c
+
+    Set PLitemReader = Result
+End Function
+Private Function ReclassifingVNQ(ByVal Sample As String, Optional ByVal NickName As String = "Unknown") As Collection ' Reclassifing Vender, partNumber, QTY by Cell Value
+    Dim Result As New Collection, Target As itemUnit
+    Dim sVender As String, sPartNumber As String, sQTY As String
+    Dim Venders As Variant, PartNumbers As Variant
+    Dim i As Long, p As Long
+    
+    Sample = Trim(CStr(Sample))
+    Sample = Replace(Sample, " [", "$[") ' 공백 없애기
+    Venders = Split(Sample, "$") ' Vender별로 분류
+    For i = LBound(Venders) To UBound(Venders)
+        sVender = ExtractBracketValue(Venders(i))
+        PartNumbers = Split(Trim(Replace(Venders(i), "[" & sVender & "]", "")), "/") ' 1개의 Vender 내의 부품넘버별로 분류
+        For p = LBound(PartNumbers) To UBound(PartNumbers)
+            sPartNumber = InStr(PartNumbers(p), "(")
+            If CLng(sPartNumber) = 0 Then
+                sPartNumber = PartNumbers(p)
+                sQTY = 1
+            Else
+                sPartNumber = Left$(PartNumbers(p), CLng(sPartNumber) - 1)
+                sQTY = ExtractSmallBracketValue(PartNumbers(p))
+            End If
+            Set Target = New itemUnit
+            Target.NickName = NickName
+            Target.Vender = sVender
+            Target.PartNumber = sPartNumber
+            Target.QTY = CLng(sQTY)
+            Result.Add Target
+        Next p
+    Erase PartNumbers
+    Next i
+    Erase Venders
+    
+    Set ReclassifingVNQ = Result
+End Function
+'==== 타겟(자기 자신) 바인드 ====================================================
+Private Sub Set_Target(ByVal TargetDir As String, Optional ByVal Target_Worksheet_index As Variant = 1)
+    If LenB(TargetDir) = 0 Then Exit Sub
+
+    If Not BindWorkbook( _
+            TargetDir:=TargetDir, _
+            WantVisible:=False, _
+            AppOut:=xlApp, _
+            WbOut:=tWB) Then
+        Debug.Print "Failed to bind target workbook: " & TargetDir
+        Exit Sub
+    End If
+
+    If Not BindWorksheet(Wb:=tWB, WSRef:=Target_Worksheet_index, WsOut:=tWS) Then
+        Debug.Print "Failed to bind target worksheet: " & CStr(Target_Worksheet_index)
+        Exit Sub
+    End If
+End Sub
+
+'==== 레퍼런스(상대 파일) 바인드 ================================================
+Private Sub Get_Reference(ByVal TargetDir As String, Optional ByVal Target_Worksheet_index As Variant = 1)
+    If LenB(TargetDir) = 0 Then Exit Sub
+
+    If Not BindWorkbook( _
+            TargetDir:=TargetDir, _
+            WantVisible:=False, _
+            AppOut:=xlApp, _
+            WbOut:=rWB) Then
+        Debug.Print "Failed to bind reference workbook: " & TargetDir
+        Exit Sub
+    End If
+
+    If Not BindWorksheet(Wb:=rWB, WSRef:=Target_Worksheet_index, WsOut:=rWS) Then
+        Debug.Print "Failed to bind reference worksheet: " & CStr(Target_Worksheet_index)
+        Exit Sub
+    End If
+End Sub
+
+'==== 유틸 (아이템 편집/표시 등은 추후 구현) ====================================
+Private Sub itemAdder()
+End Sub
+
+Private Sub itemKiller()
+End Sub
+
+Private Sub itemEditor()
+End Sub
+
+Private Sub DayFollower()
+End Sub
+
+Private Sub RowSaver()
+End Sub
+
+Private Sub ViewerRefresh()
+    
+End Sub
+
+'===============================================================================
+'= 공용 헬퍼: Workbook/Worksheet 바인딩 (중복 제거의 핵심)
+'===============================================================================
+' [동작 순서]
+' 1) GetObject(TargetDir) 시도: 이미 열려 있으면 해당 인스턴스의 Workbook 반환, 열려 있지 않으면 열기
+' 2) 실패 시: 실행 중 Excel 인스턴스에 붙어서 FullName/Name 비교로 찾기
+' 3) 그래도 실패 시: 새 인스턴스를 띄워서 Open (실패하면 Quit)
+'
+' 반환값: 성공 True / 실패 False
+Private Function BindWorkbook( _
+    ByVal TargetDir As String, _
+    ByVal WantVisible As Boolean, _
+    ByRef AppOut As Excel.Application, _
+    ByRef WbOut As Workbook) As Boolean
+
+    Dim fileName As String
+    fileName = Dir$(TargetDir)
+    If Len(fileName) = 0 Then
+        Debug.Print "File not found: " & TargetDir
+        BindWorkbook = False
+        Exit Function
+    End If
+
+    On Error GoTo EH_GetObject
+    ' 1) 최우선: 열려 있든 아니든 GetObject로 직접 바인딩(또는 개방)
+    Set WbOut = GetObject(TargetDir)              ' Workbook
+    Set AppOut = WbOut.Application                ' Excel.Application
+    If StrComp(WbOut.FullName, ThisWorkbook.FullName, vbTextCompare) <> 0 Then AppOut.Visible = WantVisible
+    BindWorkbook = True
+    Exit Function
+
+EH_GetObject:
+    ' 2) 실행 중 Excel 인스턴스에서 검색
+    Dim runningApp As Excel.Application
+    Dim Wb As Workbook
+
+    On Error Resume Next
+    Set runningApp = GetObject(, "Excel.Application")
+    On Error GoTo 0
+
+    If Not runningApp Is Nothing Then
+        For Each Wb In runningApp.Workbooks
+            If StrComp(Wb.FullName, TargetDir, vbTextCompare) = 0 _
+               Or StrComp(Wb.Name, fileName, vbTextCompare) = 0 Then
+                Set WbOut = Wb
+                Set AppOut = runningApp
+                If StrComp(WbOut.FullName, ThisWorkbook.FullName, vbTextCompare) <> 0 Then AppOut.Visible = WantVisible
+                BindWorkbook = True
+                Exit Function
+            End If
+        Next
+    End If
+
+    ' 3) 새 인스턴스 생성 후 열기
+    Dim newApp As Excel.Application
+    Set newApp = New Excel.Application
+    newApp.Visible = WantVisible
+
+    On Error GoTo EH_OpenNew
+    Set WbOut = newApp.Workbooks.open(fileName:=TargetDir, ReadOnly:=True, Notify:=False)
+    Set AppOut = newApp
+    BindWorkbook = True
+    Exit Function
+
+EH_OpenNew:
+    ' 열기 실패하면 새 인스턴스 정리
+    On Error Resume Next
+    newApp.Quit
+    Set newApp = Nothing
+    On Error GoTo 0
+
+    Debug.Print "Failed to open workbook: " & TargetDir
+    BindWorkbook = False
+End Function
+
+' Worksheet 인덱스(숫자) / 이름(문자열) 모두 지원
+Private Function BindWorksheet( _
+    ByVal Wb As Workbook, _
+    ByVal WSRef As Variant, _
+    ByRef WsOut As Worksheet) As Boolean
+
+    On Error GoTo EH
+    If isNumeric(WSRef) Then
+        Set WsOut = Wb.Worksheets(CLng(WSRef))
+    Else
+        Set WsOut = Wb.Worksheets(CStr(WSRef))
+    End If
+
+    BindWorksheet = True
+    Exit Function
+
+EH:
+    BindWorksheet = False
+End Function
+
+Private Sub TempKiller(Optional ByRef Temp As Variant)
+    If Not tWB Is Nothing Then
+        If StrComp(tWB.FullName, ThisWorkbook.FullName, vbTextCompare) <> 0 Then tWB.Close False
+        Set tWS = Nothing
+        Set tWB = Nothing
+    End If
+    
+    If Not rWB Is Nothing Then
+        If StrComp(rWB.FullName, ThisWorkbook.FullName, vbTextCompare) <> 0 Then rWB.Close False
+        Set rWS = Nothing
+        Set rWB = Nothing
+    End If
+    
+    Set Temp = Nothing
+End Sub
+
 ````
 
