@@ -1,3 +1,4 @@
+Attribute VB_Name = "AA_Test"
 Private ws As Worksheet
 
 Public Sub Painter_Test()
@@ -5,10 +6,10 @@ Public Sub Painter_Test()
     Dim AAA As New Painter: Set AAA.DrawingWorksheet = ws
     Dim i As Long
     AAA.DeleteShapes ': Exit Sub
-    Const StartRow As Long = 3
+    Const startRow As Long = 3
     Const Gap As Long = 3
     
-    Dim A As Long, b As Long, c As Long, d As Long
+    Dim a As Long, b As Long, c As Long, d As Long
     Dim innerString As String, OuterString As String, BASD As Shape
     Dim SubTexts As New Collection: SubTexts.Add "ABCD"
     
@@ -35,10 +36,13 @@ End Sub
 Public Sub Borders_Test()
     Set ws = ThisWorkbook.Worksheets("test")
     
+    Debug.Print ws.Rows.Count
+    Debug.Print ws.Columns.Count
+    
     With ws.Cells(2, 33)
         '.Borders.Weight = xlThick
         '.Borders.LineStyle = xlContinuous: .value = "xlContinuous"
-        .Borders.LineStyle = xlDash: .Borders.Weight = xlMedium: .value = "xlDash"
+    '    .Borders.LineStyle = xlDash: .Borders.Weight = xlMedium: .value = "xlDash"
         '.Borders.LineStyle = xlDashDot: .value = "xlDashDot"
         '.Borders.LineStyle = xlDashDotDot: .value = "xlDashDotDot"
         '.Borders.LineStyle = xlDot: .value = "xlDot"

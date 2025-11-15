@@ -1,19 +1,20 @@
+Attribute VB_Name = "Printer"
 Public Type PrintSetting
-    PrintArea As String ' ì£¼ì†Œ
-    Orientation As XlPageOrientation ' ì¸ì‡„ë°©í–¥
-    LeftMargin As Single ' ì¢Œì¸¡ ì—¬ë°±
-    RightMargin As Single ' ìš°ì¸¡ ì—¬ë°±
-    TopMargin As Single ' ìƒë‹¨ ì—¬ë°±
-    BottomMargin As Single ' í•˜ë‹¨ ì—¬ë°±
-    HeaderMargin As Single ' í—¤ë” ì—¬ë°±
-    FooterMargin As Single ' í‘¸í„° ì—¬ë°±
-    PaperSize As XlPaperSize ' ì¢…ì´ í¬ê¸°
+    PrintArea As String ' ÁÖ¼Ò
+    Orientation As XlPageOrientation ' ÀÎ¼â¹æÇâ
+    LeftMargin As Single ' ÁÂÃø ¿©¹é
+    RightMargin As Single ' ¿ìÃø ¿©¹é
+    TopMargin As Single ' »ó´Ü ¿©¹é
+    BottomMargin As Single ' ÇÏ´Ü ¿©¹é
+    HeaderMargin As Single ' Çì´õ ¿©¹é
+    FooterMargin As Single ' ÇªÅÍ ¿©¹é
+    PaperSize As XlPaperSize ' Á¾ÀÌ Å©±â
     Zoom As Boolean
-    FitToPagesWide As Variant ' ê°€ë¡œ í˜ì´ì§€ ê°œìˆ˜
-    FitToPagesTall As Variant ' ì„¸ë¡œ í˜ì´ì§€ ê°œìˆ˜
-    CenterHorizontally As Boolean ' í”„ë¦°íŠ¸ ë‚´ìš©ì„ ê°€ë¡œ ì¤‘ì•™ì •ë ¬
-    CenterVertically As Boolean ' í”„ë¦°íŠ¸ ë‚´ìš©ì„ ì„¸ë¡œ ì¤‘ì•™ì •ë ¬
-    PrintTitleRows As String ' ë°˜ë³µí–‰ ì£¼ì†Œê°’
+    FitToPagesWide As Variant ' °¡·Î ÆäÀÌÁö °³¼ö
+    FitToPagesTall As Variant ' ¼¼·Î ÆäÀÌÁö °³¼ö
+    CenterHorizontally As Boolean ' ÇÁ¸°Æ® ³»¿ëÀ» °¡·Î Áß¾ÓÁ¤·Ä
+    CenterVertically As Boolean ' ÇÁ¸°Æ® ³»¿ëÀ» ¼¼·Î Áß¾ÓÁ¤·Ä
+    PrintTitleRows As String ' ¹İº¹Çà ÁÖ¼Ò°ª
     AlignMarginsHeaderFooter As Boolean
     RightHeader As String
     LeftHeader As String
@@ -26,7 +27,7 @@ Public Type PrtNowBoolean
     DailyReport As Boolean
 End Type
 
-'í”„ë¦°íŠ¸ ì…‹ì—…ì´ ìœ ì§€ë˜ëŠ”ì§€ ì²´í¬í•˜ëŠ” ë¶ˆë¦¬ì–¸ ë³€ìˆ˜
+'ÇÁ¸°Æ® ¼Â¾÷ÀÌ À¯ÁöµÇ´ÂÁö Ã¼Å©ÇÏ´Â ºÒ¸®¾ğ º¯¼ö
 Public PrintNow As PrtNowBoolean
 Public OriginalKiller As PrtNowBoolean
 
@@ -70,25 +71,25 @@ Function PS_BOM(ByRef ws As Worksheet, PR As Range) As PrintSetting
     Dim TitleRow As Long: TitleRow = ws.UsedRange.Find("0").Row - 1
     
     With BA_BOM_Viewer_PS
-        .PrintArea = PR.Address 'ì£¼ì†Œ
-        .Orientation = xlPortrait 'ì¸ì‡„ë°©í–¥ ì„¸ë¡œ
-        .LeftMargin = 0 ' ì¢Œì¸¡ ì—¬ë°±
-        .RightMargin = 0 ' ìš°ì¸¡ ì—¬ë°±
-        .TopMargin = 0 ' ìƒë‹¨ ì—¬ë°±
-        .BottomMargin = 0.3 ' í•˜ë‹¨ ì—¬ë°±
-        .HeaderMargin = 0.68 ' í—¤ë” ì—¬ë°±
-        .FooterMargin = 0 ' í‘¸í„° ì—¬ë°±
-        .PaperSize = xlPaperA4 ' í‘œì¤€ A4 í¬ê¸°
+        .PrintArea = PR.Address 'ÁÖ¼Ò
+        .Orientation = xlPortrait 'ÀÎ¼â¹æÇâ ¼¼·Î
+        .LeftMargin = 0 ' ÁÂÃø ¿©¹é
+        .RightMargin = 0 ' ¿ìÃø ¿©¹é
+        .TopMargin = 0 ' »ó´Ü ¿©¹é
+        .BottomMargin = 0.3 ' ÇÏ´Ü ¿©¹é
+        .HeaderMargin = 0.68 ' Çì´õ ¿©¹é
+        .FooterMargin = 0 ' ÇªÅÍ ¿©¹é
+        .PaperSize = xlPaperA4 ' Ç¥ÁØ A4 Å©±â
         .Zoom = False
-        .FitToPagesWide = 1 ' ê°€ë¡œ í˜ì´ì§€ ê°œìˆ˜
-        .FitToPagesTall = False ' ì„¸ë¡œ í˜ì´ì§€ ê°œìˆ˜
+        .FitToPagesWide = 1 ' °¡·Î ÆäÀÌÁö °³¼ö
+        .FitToPagesTall = False ' ¼¼·Î ÆäÀÌÁö °³¼ö
         .CenterHorizontally = True
         .CenterVertically = False
         .PrintTitleRows = "$1:$" & TitleRow
         .AlignMarginsHeaderFooter = False
-        .RightHeader = "&""LGìŠ¤ë§ˆíŠ¸ì²´ Light""&8 " & "ì—°ì›”ì¼" & Format(Now(), "YYMMDD") & Chr(10) _
-                            & "&""LGìŠ¤ë§ˆíŠ¸ì²´ Light""&8 " & "ì‹œë¶„ì´ˆ" & Format(Now(), "HHMMSS") & Chr(10) _
-                            & "&""LGìŠ¤ë§ˆíŠ¸ì²´ Bold""&22 &P / &N"
+        .RightHeader = "&""LG½º¸¶Æ®Ã¼ Light""&8 " & "¿¬¿ùÀÏ" & Format(Now(), "YYMMDD") & Chr(10) _
+                            & "&""LG½º¸¶Æ®Ã¼ Light""&8 " & "½ÃºĞÃÊ" & Format(Now(), "HHMMSS") & Chr(10) _
+                            & "&""LG½º¸¶Æ®Ã¼ Bold""&22 &P / &N"
     End With
     
     PS_BOM = BA_BOM_Viewer_PS
@@ -98,25 +99,25 @@ Function PS_BOMforPDF(ByRef ws As Worksheet, PR As Range) As PrintSetting
     Dim TitleRow As Long: TitleRow = ws.UsedRange.Find("0").Row - 1
     
     With BA_BOM_Viewer_PS
-        .PrintArea = PR.Address 'ì£¼ì†Œ
-        .Orientation = xlPortrait 'ì¸ì‡„ë°©í–¥ ì„¸ë¡œ
-        .LeftMargin = 0 ' ì¢Œì¸¡ ì—¬ë°±
-        .RightMargin = 0 ' ìš°ì¸¡ ì—¬ë°±
-        .TopMargin = 0.5 ' ìƒë‹¨ ì—¬ë°±
-        .BottomMargin = 0.3 ' í•˜ë‹¨ ì—¬ë°±
-        .HeaderMargin = 0.68 ' í—¤ë” ì—¬ë°±
-        .FooterMargin = 0 ' í‘¸í„° ì—¬ë°±
-        .PaperSize = xlPaperA4 ' í‘œì¤€ A4 í¬ê¸°
+        .PrintArea = PR.Address 'ÁÖ¼Ò
+        .Orientation = xlPortrait 'ÀÎ¼â¹æÇâ ¼¼·Î
+        .LeftMargin = 0 ' ÁÂÃø ¿©¹é
+        .RightMargin = 0 ' ¿ìÃø ¿©¹é
+        .TopMargin = 0.5 ' »ó´Ü ¿©¹é
+        .BottomMargin = 0.3 ' ÇÏ´Ü ¿©¹é
+        .HeaderMargin = 0.68 ' Çì´õ ¿©¹é
+        .FooterMargin = 0 ' ÇªÅÍ ¿©¹é
+        .PaperSize = xlPaperA4 ' Ç¥ÁØ A4 Å©±â
         .Zoom = False
-        .FitToPagesWide = 1 ' ê°€ë¡œ í˜ì´ì§€ ê°œìˆ˜
-        .FitToPagesTall = False ' ì„¸ë¡œ í˜ì´ì§€ ê°œìˆ˜
+        .FitToPagesWide = 1 ' °¡·Î ÆäÀÌÁö °³¼ö
+        .FitToPagesTall = False ' ¼¼·Î ÆäÀÌÁö °³¼ö
         .CenterHorizontally = True
         .CenterVertically = False
         .PrintTitleRows = "$1:$" & TitleRow
         .AlignMarginsHeaderFooter = False
-        .RightHeader = "&""LGìŠ¤ë§ˆíŠ¸ì²´ Light""&8 " & "ì—°ì›”ì¼" & Format(Now(), "YYMMDD") & Chr(10) _
-                            & "&""LGìŠ¤ë§ˆíŠ¸ì²´ Light""&8 " & "ì‹œë¶„ì´ˆ" & Format(Now(), "HHMMSS") & Chr(10) _
-                            & "&""LGìŠ¤ë§ˆíŠ¸ì²´ Bold""&22 &P / &N"
+        .RightHeader = "&""LG½º¸¶Æ®Ã¼ Light""&8 " & "¿¬¿ùÀÏ" & Format(Now(), "YYMMDD") & Chr(10) _
+                            & "&""LG½º¸¶Æ®Ã¼ Light""&8 " & "½ÃºĞÃÊ" & Format(Now(), "HHMMSS") & Chr(10) _
+                            & "&""LG½º¸¶Æ®Ã¼ Bold""&22 &P / &N"
     End With
     
     PS_BOMforPDF = BA_BOM_Viewer_PS
@@ -126,18 +127,18 @@ Function PS_DailyPlan(PR As Range) As PrintSetting
     Dim BB_DailyPlan_Viewer_PS As PrintSetting
     
     With BB_DailyPlan_Viewer_PS
-        .PrintArea = PR.Address 'ì£¼ì†Œ
-        .Orientation = xlPortrait 'ì¸ì‡„ë°©í–¥ ì„¸ë¡œ
-        .LeftMargin = 0 ' ì¢Œì¸¡ ì—¬ë°±
-        .RightMargin = 0 ' ìš°ì¸¡ ì—¬ë°±
-        .TopMargin = 0.3 ' ìƒë‹¨ ì—¬ë°±
-        .BottomMargin = 0.3 ' í•˜ë‹¨ ì—¬ë°±
-        .HeaderMargin = 0 ' í—¤ë” ì—¬ë°±
-        .FooterMargin = 0 ' í‘¸í„° ì—¬ë°±
-        .PaperSize = xlPaperA4 ' í‘œì¤€ A4 í¬ê¸°
+        .PrintArea = PR.Address 'ÁÖ¼Ò
+        .Orientation = xlPortrait 'ÀÎ¼â¹æÇâ ¼¼·Î
+        .LeftMargin = 0 ' ÁÂÃø ¿©¹é
+        .RightMargin = 0 ' ¿ìÃø ¿©¹é
+        .TopMargin = 0.3 ' »ó´Ü ¿©¹é
+        .BottomMargin = 0.3 ' ÇÏ´Ü ¿©¹é
+        .HeaderMargin = 0 ' Çì´õ ¿©¹é
+        .FooterMargin = 0 ' ÇªÅÍ ¿©¹é
+        .PaperSize = xlPaperA4 ' Ç¥ÁØ A4 Å©±â
         .Zoom = False
-        .FitToPagesWide = 1 ' ê°€ë¡œ í˜ì´ì§€ ê°œìˆ˜
-        .FitToPagesTall = False ' ì„¸ë¡œ í˜ì´ì§€ ê°œìˆ˜
+        .FitToPagesWide = 1 ' °¡·Î ÆäÀÌÁö °³¼ö
+        .FitToPagesTall = False ' ¼¼·Î ÆäÀÌÁö °³¼ö
         .CenterHorizontally = True
         .CenterVertically = False
         .PrintTitleRows = "$1:$2"
@@ -152,18 +153,18 @@ Function PS_DPforPDF(PR As Range) As PrintSetting
     Dim BB_DailyPlan_Viewer_PS As PrintSetting
     
     With BB_DailyPlan_Viewer_PS
-        .PrintArea = PR.Address 'ì£¼ì†Œ
-        .Orientation = xlPortrait 'ì¸ì‡„ë°©í–¥ ì„¸ë¡œ
-        .LeftMargin = 0 ' ì¢Œì¸¡ ì—¬ë°±
-        .RightMargin = 0 ' ìš°ì¸¡ ì—¬ë°±
-        .TopMargin = 0.3 ' ìƒë‹¨ ì—¬ë°±
-        .BottomMargin = 0.3 ' í•˜ë‹¨ ì—¬ë°±
-        .HeaderMargin = 0 ' í—¤ë” ì—¬ë°±
-        .FooterMargin = 0 ' í‘¸í„° ì—¬ë°±
-        .PaperSize = xlPaperA4 ' í‘œì¤€ A4 í¬ê¸°
+        .PrintArea = PR.Address 'ÁÖ¼Ò
+        .Orientation = xlPortrait 'ÀÎ¼â¹æÇâ ¼¼·Î
+        .LeftMargin = 0 ' ÁÂÃø ¿©¹é
+        .RightMargin = 0 ' ¿ìÃø ¿©¹é
+        .TopMargin = 0.3 ' »ó´Ü ¿©¹é
+        .BottomMargin = 0.3 ' ÇÏ´Ü ¿©¹é
+        .HeaderMargin = 0 ' Çì´õ ¿©¹é
+        .FooterMargin = 0 ' ÇªÅÍ ¿©¹é
+        .PaperSize = xlPaperA4 ' Ç¥ÁØ A4 Å©±â
         .Zoom = False
-        .FitToPagesWide = 1 ' ê°€ë¡œ í˜ì´ì§€ ê°œìˆ˜
-        .FitToPagesTall = False ' ì„¸ë¡œ í˜ì´ì§€ ê°œìˆ˜
+        .FitToPagesWide = 1 ' °¡·Î ÆäÀÌÁö °³¼ö
+        .FitToPagesTall = False ' ¼¼·Î ÆäÀÌÁö °³¼ö
         .CenterHorizontally = True
         .CenterVertically = False
         .PrintTitleRows = "$1:$2"
@@ -178,18 +179,18 @@ Function PS_PartList(PR As Range) As PrintSetting
     Dim PartList_Viewer_PS As PrintSetting
     
     With PartList_Viewer_PS
-        .PrintArea = PR.Address 'ì£¼ì†Œ
-        .Orientation = xlLandscape 'ì¸ì‡„ë°©í–¥ ê°€ë¡œ
-        .LeftMargin = 0 ' ì¢Œì¸¡ ì—¬ë°±
-        .RightMargin = 0 ' ìš°ì¸¡ ì—¬ë°±
-        .TopMargin = 0 ' ìƒë‹¨ ì—¬ë°±
-        .BottomMargin = 0 ' í•˜ë‹¨ ì—¬ë°±
-        .HeaderMargin = 0 ' í—¤ë” ì—¬ë°±
-        .FooterMargin = 0 ' í‘¸í„° ì—¬ë°±
-        .PaperSize = xlPaperA4 ' í‘œì¤€ A4 í¬ê¸°
+        .PrintArea = PR.Address 'ÁÖ¼Ò
+        .Orientation = xlLandscape 'ÀÎ¼â¹æÇâ °¡·Î
+        .LeftMargin = 0 ' ÁÂÃø ¿©¹é
+        .RightMargin = 0 ' ¿ìÃø ¿©¹é
+        .TopMargin = 0 ' »ó´Ü ¿©¹é
+        .BottomMargin = 0 ' ÇÏ´Ü ¿©¹é
+        .HeaderMargin = 0 ' Çì´õ ¿©¹é
+        .FooterMargin = 0 ' ÇªÅÍ ¿©¹é
+        .PaperSize = xlPaperA4 ' Ç¥ÁØ A4 Å©±â
         .Zoom = False
-        .FitToPagesWide = 1 ' ê°€ë¡œ í˜ì´ì§€ ê°œìˆ˜
-        .FitToPagesTall = False ' ì„¸ë¡œ í˜ì´ì§€ ê°œìˆ˜
+        .FitToPagesWide = 1 ' °¡·Î ÆäÀÌÁö °³¼ö
+        .FitToPagesTall = False ' ¼¼·Î ÆäÀÌÁö °³¼ö
         .CenterHorizontally = True
         .CenterVertically = False
         .PrintTitleRows = "$1:$1"
@@ -204,18 +205,18 @@ Function PS_PLEP(PR As Range) As PrintSetting ' PartList each Parts
     Dim PartList_Viewer_PS As PrintSetting
     
     With PartList_Viewer_PS
-        .PrintArea = PR.Address 'ì£¼ì†Œ
-        .Orientation = xlPortrait 'ì¸ì‡„ë°©í–¥ ê°€ë¡œ
-        .LeftMargin = 0 ' ì¢Œì¸¡ ì—¬ë°±
-        .RightMargin = 0 ' ìš°ì¸¡ ì—¬ë°±
-        .TopMargin = 0 ' ìƒë‹¨ ì—¬ë°±
-        .BottomMargin = 0 ' í•˜ë‹¨ ì—¬ë°±
-        .HeaderMargin = 0 ' í—¤ë” ì—¬ë°±
-        .FooterMargin = 0 ' í‘¸í„° ì—¬ë°±
-        .PaperSize = xlPaperA4 ' í‘œì¤€ A4 í¬ê¸°
+        .PrintArea = PR.Address 'ÁÖ¼Ò
+        .Orientation = xlPortrait 'ÀÎ¼â¹æÇâ °¡·Î
+        .LeftMargin = 0 ' ÁÂÃø ¿©¹é
+        .RightMargin = 0 ' ¿ìÃø ¿©¹é
+        .TopMargin = 0 ' »ó´Ü ¿©¹é
+        .BottomMargin = 0 ' ÇÏ´Ü ¿©¹é
+        .HeaderMargin = 0 ' Çì´õ ¿©¹é
+        .FooterMargin = 0 ' ÇªÅÍ ¿©¹é
+        .PaperSize = xlPaperA4 ' Ç¥ÁØ A4 Å©±â
         .Zoom = False
-        .FitToPagesWide = 1 ' ê°€ë¡œ í˜ì´ì§€ ê°œìˆ˜
-        .FitToPagesTall = False ' ì„¸ë¡œ í˜ì´ì§€ ê°œìˆ˜
+        .FitToPagesWide = 1 ' °¡·Î ÆäÀÌÁö °³¼ö
+        .FitToPagesTall = False ' ¼¼·Î ÆäÀÌÁö °³¼ö
         .CenterHorizontally = True
         .CenterVertically = False
         .PrintTitleRows = "$1:$1"
@@ -228,21 +229,21 @@ End Function
 
 Sub AutoPageSetup(ByRef ws As Worksheet, PrtStpVar As PrintSetting, _
                         Optional PreView As Boolean = False)
-    'ì¶œë ¥í•  ì›Œí¬ì‹œíŠ¸, í”„ë¦°íŠ¸ì…‹ì—… ë³€ìˆ˜, í”„ë¦¬ë·°ë¥¼ í• ì§€ë§ì§€ ê²°ì •í•˜ëŠ” ë¶ˆë¦¬ì–¸
+    'Ãâ·ÂÇÒ ¿öÅ©½ÃÆ®, ÇÁ¸°Æ®¼Â¾÷ º¯¼ö, ÇÁ¸®ºä¸¦ ÇÒÁö¸»Áö °áÁ¤ÇÏ´Â ºÒ¸®¾ğ
 
     With ws.PageSetup
         .PrintArea = PrtStpVar.PrintArea
         .Orientation = PrtStpVar.Orientation
-        .LeftMargin = Application.CentimetersToPoints(PrtStpVar.LeftMargin) ' ì¢Œì¸¡ ì—¬ë°±
-        .RightMargin = Application.CentimetersToPoints(PrtStpVar.RightMargin) ' ìš°ì¸¡ ì—¬ë°±
-        .TopMargin = Application.CentimetersToPoints(PrtStpVar.TopMargin)  ' ìƒë‹¨ ì—¬ë°±
-        .BottomMargin = Application.CentimetersToPoints(PrtStpVar.BottomMargin)  ' í•˜ë‹¨ ì—¬ë°±
-        .HeaderMargin = Application.CentimetersToPoints(PrtStpVar.HeaderMargin)  ' í—¤ë” ì—¬ë°±
-        .FooterMargin = Application.CentimetersToPoints(PrtStpVar.FooterMargin)  ' í‘¸í„° ì—¬ë°±
-        .PaperSize = PrtStpVar.PaperSize  ' í‘œì¤€ A4 í¬ê¸°
+        .LeftMargin = Application.CentimetersToPoints(PrtStpVar.LeftMargin) ' ÁÂÃø ¿©¹é
+        .RightMargin = Application.CentimetersToPoints(PrtStpVar.RightMargin) ' ¿ìÃø ¿©¹é
+        .TopMargin = Application.CentimetersToPoints(PrtStpVar.TopMargin)  ' »ó´Ü ¿©¹é
+        .BottomMargin = Application.CentimetersToPoints(PrtStpVar.BottomMargin)  ' ÇÏ´Ü ¿©¹é
+        .HeaderMargin = Application.CentimetersToPoints(PrtStpVar.HeaderMargin)  ' Çì´õ ¿©¹é
+        .FooterMargin = Application.CentimetersToPoints(PrtStpVar.FooterMargin)  ' ÇªÅÍ ¿©¹é
+        .PaperSize = PrtStpVar.PaperSize  ' Ç¥ÁØ A4 Å©±â
         .Zoom = PrtStpVar.Zoom
-        .FitToPagesWide = PrtStpVar.FitToPagesWide ' ê°€ë¡œ í˜ì´ì§€ ê°œìˆ˜
-        .FitToPagesTall = PrtStpVar.FitToPagesTall ' ì„¸ë¡œ í˜ì´ì§€ ê°œìˆ˜
+        .FitToPagesWide = PrtStpVar.FitToPagesWide ' °¡·Î ÆäÀÌÁö °³¼ö
+        .FitToPagesTall = PrtStpVar.FitToPagesTall ' ¼¼·Î ÆäÀÌÁö °³¼ö
         .CenterHorizontally = PrtStpVar.CenterHorizontally
         .CenterVertically = PrtStpVar.CenterVertically
         .PrintTitleRows = PrtStpVar.PrintTitleRows

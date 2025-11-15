@@ -1,9 +1,10 @@
+Attribute VB_Name = "Cleaner"
 Sub FolderKiller(ByVal folderDirectory As String)
-    Dim FSO As Object
-    Set FSO = CreateObject("Scripting.FileSystemObject")
+    Dim fso As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
     
-    If FSO.FolderExists(folderDirectory) Then
-        FSO.DeleteFolder folderDirectory, True
+    If fso.FolderExists(folderDirectory) Then
+        fso.DeleteFolder folderDirectory, True
     Else
         Exit Sub
     End If

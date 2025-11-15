@@ -1,3 +1,12 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "ProductModel2"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 Option Explicit
 
 Private vPrevious As ModelInfo
@@ -10,7 +19,7 @@ Private vChCount As Long
 Private vLOT As Long
 
 
-'ì´ˆê¸°í™” ì´ë²¤íŠ¸ ë©”ì„œë“œ
+'ÃÊ±âÈ­ ÀÌº¥Æ® ¸Ş¼­µå
 Private Sub Class_Initialize()
     Set vPrevious = New ModelInfo
     Set vCurrent = New ModelInfo
@@ -19,7 +28,7 @@ Private Sub Class_Initialize()
     vChCount = 0
     vLOT = 1
 End Sub
-'ì†Œë©¸ ì´ë²¤íŠ¸ ë©”ì„œë“œ
+'¼Ò¸ê ÀÌº¥Æ® ¸Ş¼­µå
 Private Sub Class_Terminate()
     Set vPrevious = Nothing
     Set vCurrent = Nothing
@@ -54,14 +63,14 @@ Public Property Get Lot() As Long
 End Property
 
 Public Sub NextModel(ByRef NextTarget As Range)
-    Set vPrevious = vCurrent.Copy  ' í˜„ì¬ > ì´ì „
-    Set vCurrent = vNext.Copy  ' ë‹¤ìŒ > í˜„ì¬
+    Set vPrevious = vCurrent.Copy  ' ÇöÀç > ÀÌÀü
+    Set vCurrent = vNext.Copy  ' ´ÙÀ½ > ÇöÀç
     Set vNext = New ModelInfo
     vNext.WorkOrder = NextTarget.Offset(0, -1).value
     vNext.FullName = NextTarget.value
     vNext.Set_Pivot NextTarget
     
-    vLOT = vLOT + 1 ' ëª¨ë¸ì´ ëˆ„ì ë  ë•Œë§ˆë‹¤ ì „ë¶€ ì…ˆ
+    vLOT = vLOT + 1 ' ¸ğµ¨ÀÌ ´©ÀûµÉ ¶§¸¶´Ù ÀüºÎ ¼À
     
 End Sub
 Public Sub SetModel(ByRef Current_Target As Range, ByRef Next_Target As Range)
@@ -86,7 +95,7 @@ Public Function Compare2Models(ByRef Target1 As ModelInfo, ByRef Target2 As Mode
     End Select
 End Function
 
-' ë””ë²„ê¹…ìš© ë””í…Œì¼
+' µğ¹ö±ë¿ë µğÅ×ÀÏ
 Public Sub Detail(ByRef PrevM As ModelInfo, _
                         ByRef CurrM As ModelInfo, _
                         ByRef NextM As ModelInfo, _
@@ -96,10 +105,10 @@ Public Sub Detail(ByRef PrevM As ModelInfo, _
     
     Select Case Controller
         Case 0
-            Debug.Print "" ' ì´ì „ ì…ë ¥ê³¼ êµ¬ë¶„ì„ ìœ„í•œ ê³µë°±
-            Debug.Print "ì´ì „ ëª¨ë¸ : " & PrevM.FullName
-            Debug.Print "í˜„ì¬ ëª¨ë¸ : " & CurrM.FullName
-            Debug.Print "ë‹¤ìŒ ëª¨ë¸ : " & NextM.FullName
+            Debug.Print "" ' ÀÌÀü ÀÔ·Â°ú ±¸ºĞÀ» À§ÇÑ °ø¹é
+            Debug.Print "ÀÌÀü ¸ğµ¨ : " & PrevM.FullName
+            Debug.Print "ÇöÀç ¸ğµ¨ : " & CurrM.FullName
+            Debug.Print "´ÙÀ½ ¸ğµ¨ : " & NextM.FullName
             Debug.Print CurrM.FullName
             Debug.Print CurrM.Number
             Debug.Print CurrM.Spec

@@ -1,10 +1,19 @@
-'ìŠ¤í‹°ì»¤ë¼ë²¨ì˜ ê·¸ë¦¼ ë“œë¡œì‰ ê¸°ëŠ¥ì„ ìœ„í•œ í´ë˜ìŠ¤
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "StickerLabel"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+'½ºÆ¼Ä¿¶óº§ÀÇ ±×¸² µå·ÎÀ× ±â´ÉÀ» À§ÇÑ Å¬·¡½º
 Private DrawingWS As Worksheet
-'ì´ˆê¸°í™” ì´ë²¤íŠ¸ ë©”ì„œë“œ
+'ÃÊ±âÈ­ ÀÌº¥Æ® ¸Ş¼­µå
 'Private Sub Class_Initialize()
 '
 'End Sub
-'ì†Œë©¸ ì´ë²¤íŠ¸ ë©”ì„œë“œ
+'¼Ò¸ê ÀÌº¥Æ® ¸Ş¼­µå
 'Private Sub Class_Terminate()
 '
 'End Sub
@@ -76,41 +85,41 @@ Public Function SingleLabel(ByRef Xaxis As Single, ByRef Yaxis As Single, _
                                             Optional ByRef Direction As ObjDirection4Way = d4UP, _
                                             Optional ByRef MainText As String = "None") As Shape
 ' Label Processing
-    Dim LineEndPivot As New ObjPivotAxis ' ê°œì²´ì˜ ì—°ì‚°ì§€ì 
+    Dim LineEndPivot As New ObjPivotAxis ' °³Ã¼ÀÇ ¿¬»êÁöÁ¡
     Dim shp(1 To 2) As Shape
     
     Set shp(2) = DrawingWS.Shapes.AddLabel(msoTextOrientationHorizontal, 0, 0, 0, 0)
     ApplyMainTextBoxSettings shp(2), MainText, 1.5
     
-    With shp(2) ' ë„ˆë¹„ì™€ ë†’ì´ ì¶”ì¶œ í›„ Lengthì— ë°˜ì˜
+    With shp(2) ' ³Êºñ¿Í ³ôÀÌ ÃßÃâ ÈÄ Length¿¡ ¹İ¿µ
         If Direction = d4LEFT Or Direction = d4RIGHT Then Length = Length + .Width / 2
         If Direction = d4UP Or Direction = d4DOWN Then Length = Length + .Height / 2
     End With
     
-    If Direction = d4UP Or Direction = d4LEFT Then Length = Length * -1 ' UPê³¼ LEFTëŠ” ë°˜ì „
+    If Direction = d4UP Or Direction = d4LEFT Then Length = Length * -1 ' UP°ú LEFT´Â ¹İÀü
     
-    Select Case Direction ' ë°©í–¥íƒ€
+    Select Case Direction ' ¹æÇâÅ¸
     Case d4LEFT, d4RIGHT
         LineEndPivot.X = Xaxis + Length
-        LineEndPivot.y = Yaxis
+        LineEndPivot.Y = Yaxis
     Case d4UP, d4DOWN
         LineEndPivot.X = Xaxis
-        LineEndPivot.y = Yaxis + Length
+        LineEndPivot.Y = Yaxis + Length
     End Select
 
-    Set shp(1) = DrawingWS.Shapes.AddLine(Xaxis, Yaxis, LineEndPivot.X, LineEndPivot.y)
+    Set shp(1) = DrawingWS.Shapes.AddLine(Xaxis, Yaxis, LineEndPivot.X, LineEndPivot.Y)
     
-    With shp(1) ' ë©”ì¸ ë¼ì¸
+    With shp(1) ' ¸ŞÀÎ ¶óÀÎ
         .line.ForeColor.RGB = RGB(0, 0, 0)
         .line.Weight = LineWeight + 1
         .ZOrder msoSendToBack
     End With
     
-    With shp(2) ' ë¼ë²¨ ìœ„ì¹˜ì„ ì • ë° ì™¸í–¥ ì„¤ì •
+    With shp(2) ' ¶óº§ À§Ä¡¼±Á¤ ¹× ¿ÜÇâ ¼³Á¤
         .Visible = msoTrue
         .Fill.ForeColor.RGB = RGB(255, 255, 255)
         .Left = LineEndPivot.X - .Width / 2
-        .Top = LineEndPivot.y - .Height / 2
+        .Top = LineEndPivot.Y - .Height / 2
         .line.Visible = msoTrue
         .line.Weight = LineWeight
         .line.ForeColor.RGB = RGB(0, 0, 0)
@@ -118,7 +127,7 @@ Public Function SingleLabel(ByRef Xaxis As Single, ByRef Yaxis As Single, _
         .TextFrame.MarginRight = .TextFrame.MarginRight + 1.5
     End With
     
-    ' Grouping ì½”ë“œ
+    ' Grouping ÄÚµå
     Dim shpNames() As String
     ReDim shpNames(1 To UBound(shp))
 
@@ -141,19 +150,19 @@ Private Function StickerLabelVertical(ByRef Xaxis As Single, ByRef Yaxis As Sing
                                 Optional ByRef BridgeLineWeight As Single, _
                                 Optional ByVal HoleLineDirection As ObjDirection4Way = d4LEFT) As Shape
     
-    Dim LabelPivot As New ObjPivotAxis ' ê°œì²´ì˜ ìƒì„±ì§€ì 
-    Dim Position As New ObjPivotAxis ' ê°œì²´ì˜ ì—°ì‚°ì§€ì 
+    Dim LabelPivot As New ObjPivotAxis ' °³Ã¼ÀÇ »ı¼ºÁöÁ¡
+    Dim Position As New ObjPivotAxis ' °³Ã¼ÀÇ ¿¬»êÁöÁ¡
     
-    Const NormalHeight As Single = 20 ' Begin, End ShapeTypeì˜ ë†’ì´
-    Const Gap As Single = 3 ' ì„¸ë¡œê°„ê²© ìƒìˆ˜
-    Const Spacing As Single = 2 ' ê°€ë¡œê°„ê²© ìƒìˆ˜
+    Const NormalHeight As Single = 20 ' Begin, End ShapeTypeÀÇ ³ôÀÌ
+    Const Gap As Single = 3 ' ¼¼·Î°£°İ »ó¼ö
+    Const Spacing As Single = 2 ' °¡·Î°£°İ »ó¼ö
     Dim MainTextHeight As Single
     Dim SubTextHeight As Single
-    Dim LabelHeight As Single ' ì¤‘ê°„ Rectangle Shapeì˜ ë†’ì´
-    Dim LabelWidth As Single ' ì¤‘ê°„ Rectangle Shapeì˜ ë„ˆë¹„
+    Dim LabelHeight As Single ' Áß°£ Rectangle ShapeÀÇ ³ôÀÌ
+    Dim LabelWidth As Single ' Áß°£ Rectangle ShapeÀÇ ³Êºñ
     Dim LabelLineWeight(1 To 3) As Single
-    Dim LabelFloor As Long ' SubTexts ê°¯ìˆ˜ë¥¼ ëœ»í•¨. ì˜ˆ) ë©”ì¸í…ìŠ¤íŠ¸(1ë‹¨) = 0, íƒ€ì´í‹€/ë©”ì¸í…ìŠ¤íŠ¸(2ë‹¨) = 1, íƒ€ì´í‹€/ì„¤ëª…//ë©”ì¸í…ìŠ¤íŠ¸(3ë‹¨) = 2
-    Dim Transfer As New ObjPivotAxis ' ì…ë ¥ëœ í…ìŠ¤íŠ¸ë¡œ ë¶€í„° ê°’ì„ ì¶”ì¶œí•´ ë†’ì´, ë„ˆë¹„ ìë™ê³„ì‚°ì„ ìœ„í•œ ì „ë‹¬ìš© ë³€ìˆ˜
+    Dim LabelFloor As Long ' SubTexts °¹¼ö¸¦ ¶æÇÔ. ¿¹) ¸ŞÀÎÅØ½ºÆ®(1´Ü) = 0, Å¸ÀÌÆ²/¸ŞÀÎÅØ½ºÆ®(2´Ü) = 1, Å¸ÀÌÆ²/¼³¸í//¸ŞÀÎÅØ½ºÆ®(3´Ü) = 2
+    Dim Transfer As New ObjPivotAxis ' ÀÔ·ÂµÈ ÅØ½ºÆ®·Î ºÎÅÍ °ªÀ» ÃßÃâÇØ ³ôÀÌ, ³Êºñ ÀÚµ¿°è»êÀ» À§ÇÑ Àü´Ş¿ë º¯¼ö
     
     Dim shp(1 To 10) As Shape
     Dim HoleLine As Shape
@@ -161,22 +170,22 @@ Private Function StickerLabelVertical(ByRef Xaxis As Single, ByRef Yaxis As Sing
     If Not SubTexts Is Nothing Then
         LabelFloor = SubTexts.Count
     End If
-    'ë³€ìˆ˜ì´ˆê¸°í™”
+    'º¯¼öÃÊ±âÈ­
     MainTextHeight = 18
     SubTextHeight = 15
     
-    Set Transfer = GetStringMaxWidthNHeight(MainText, SubTexts) ' ì…ë ¥ëœ í…ìŠ¤íŠ¸ì˜ ìµœëŒ€ ê¸¸ì´ë¥¼ ì°¾ì•„ ë„ˆë¹„ì™€ ë©”ì¸, ì„œë¸Œí…ìŠ¤íŠ¸ì˜ ë†’ì´ë¥¼ ê²°ì •í•¨.
+    Set Transfer = GetStringMaxWidthNHeight(MainText, SubTexts) ' ÀÔ·ÂµÈ ÅØ½ºÆ®ÀÇ ÃÖ´ë ±æÀÌ¸¦ Ã£¾Æ ³Êºñ¿Í ¸ŞÀÎ, ¼­ºêÅØ½ºÆ®ÀÇ ³ôÀÌ¸¦ °áÁ¤ÇÔ.
     SubTextHeight = Transfer.Z
-    MainTextHeight = Transfer.y
-    LabelWidth = Transfer.X + Spacing * 2 ' ì¤‘ê°„ Rectangle ì˜ ë„ˆë¹„ ê°’
-    LabelHeight = MainTextHeight + Gap * 2 + (LabelFloor * (SubTextHeight + Gap)) ' ì¤‘ê°„ Rectangle ì˜ ë†’ì´ ê°’
+    MainTextHeight = Transfer.Y
+    LabelWidth = Transfer.X + Spacing * 2 ' Áß°£ Rectangle ÀÇ ³Êºñ °ª
+    LabelHeight = MainTextHeight + Gap * 2 + (LabelFloor * (SubTextHeight + Gap)) ' Áß°£ Rectangle ÀÇ ³ôÀÌ °ª
     
     LabelPivot.X = Xaxis
-    LabelPivot.y = Yaxis
+    LabelPivot.Y = Yaxis
     Position.X = LabelPivot.X - LabelWidth / 2
-    Position.y = LabelPivot.y - LabelHeight - NormalHeight / 2
+    Position.Y = LabelPivot.Y - LabelHeight - NormalHeight / 2
     
-    If Position.X <= 0 Or Position.y <= 0 Then
+    If Position.X <= 0 Or Position.Y <= 0 Then
         MsgBox "Position Error"
         Exit Function
     End If
@@ -187,9 +196,9 @@ Private Function StickerLabelVertical(ByRef Xaxis As Single, ByRef Yaxis As Sing
     For i = 1 To 3
         Dim Part As Long
         Part = (i - 1) * 3
-        Set shp(Part + 1) = DrawingWS.Shapes.AddShape(LabelBeginType, Position.X, Position.y, LabelWidth, NormalHeight)
-        Set shp(Part + 2) = DrawingWS.Shapes.AddShape(LabelEndType, Position.X, Position.y + LabelHeight, LabelWidth, NormalHeight)
-        Set shp(Part + 3) = DrawingWS.Shapes.AddShape(msoShapeRectangle, Position.X, Position.y + NormalHeight / 2, LabelWidth, LabelHeight)
+        Set shp(Part + 1) = DrawingWS.Shapes.AddShape(LabelBeginType, Position.X, Position.Y, LabelWidth, NormalHeight)
+        Set shp(Part + 2) = DrawingWS.Shapes.AddShape(LabelEndType, Position.X, Position.Y + LabelHeight, LabelWidth, NormalHeight)
+        Set shp(Part + 3) = DrawingWS.Shapes.AddShape(msoShapeRectangle, Position.X, Position.Y + NormalHeight / 2, LabelWidth, LabelHeight)
     Next i
             
     For i = 1 To 3
@@ -223,8 +232,8 @@ Private Function StickerLabelVertical(ByRef Xaxis As Single, ByRef Yaxis As Sing
     HoleSize = 8
     LabelLineWeight(3) = (LabelLineWeight(1) + LabelLineWeight(2)) / 4
     HolePivot.X = LabelPivot.X - HoleSize / 2
-    HolePivot.y = LabelPivot.y - HoleSize / 2
-    Set shp(10) = DrawingWS.Shapes.AddShape(msoShapeOval, HolePivot.X, HolePivot.y, HoleSize, HoleSize)
+    HolePivot.Y = LabelPivot.Y - HoleSize / 2
+    Set shp(10) = DrawingWS.Shapes.AddShape(msoShapeOval, HolePivot.X, HolePivot.Y, HoleSize, HoleSize)
     With shp(10)
         .Fill.ForeColor.RGB = RGB(0, 0, 0)
         .line.Visible = msoFalse
@@ -248,7 +257,7 @@ Private Function StickerLabelVertical(ByRef Xaxis As Single, ByRef Yaxis As Sing
             .Visible = msoTrue
             .Width = LabelWidth
             .Left = Position.X
-            .Top = Position.y + NormalHeight / 2 + Gap + (LabelFloor * (SubTextHeight + Gap))
+            .Top = Position.Y + NormalHeight / 2 + Gap + (LabelFloor * (SubTextHeight + Gap))
                 If Direction = dvDown Then .Top = .Top + LabelHeight
         End With
     
@@ -261,7 +270,7 @@ Private Function StickerLabelVertical(ByRef Xaxis As Single, ByRef Yaxis As Sing
                     .Visible = msoTrue
                     .Width = LabelWidth - Spacing
                     .Left = Position.X + Spacing
-                    .Top = Position.y + NormalHeight / 2 + Gap + ((LabelFloor - (LabelFloor - i + 1)) * (SubTextHeight + Gap))
+                    .Top = Position.Y + NormalHeight / 2 + Gap + ((LabelFloor - (LabelFloor - i + 1)) * (SubTextHeight + Gap))
                         If Direction = dvDown Then .Top = .Top + LabelHeight
                     
                 End With
@@ -273,15 +282,15 @@ Private Function StickerLabelVertical(ByRef Xaxis As Single, ByRef Yaxis As Sing
             
             For i = 1 To UBound(GLine)
             
-                Dim LinePoint As New ObjPivotAxis ' ë¼ì¸ ì§€ì • ë¡œì§ì˜ ê°€ë…ì„±ì„ ìœ„í•œ ë³€ìˆ˜ ì„ ì–¸
+                Dim LinePoint As New ObjPivotAxis ' ¶óÀÎ ÁöÁ¤ ·ÎÁ÷ÀÇ °¡µ¶¼ºÀ» À§ÇÑ º¯¼ö ¼±¾ğ
                 LinePoint.X = Position.X + Spacing
                 LinePoint.Z = Position.X + LabelWidth - Spacing
-                LinePoint.y = Position.y + (NormalHeight + Gap) / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap))
-                If Direction = dvDown Then LinePoint.y = LinePoint.y + LabelHeight
+                LinePoint.Y = Position.Y + (NormalHeight + Gap) / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap))
+                If Direction = dvDown Then LinePoint.Y = LinePoint.Y + LabelHeight
             
-                Set GLine(i) = DrawingWS.Shapes.AddLine(LinePoint.X, LinePoint.y, LinePoint.Z, LinePoint.y)
+                Set GLine(i) = DrawingWS.Shapes.AddLine(LinePoint.X, LinePoint.Y, LinePoint.Z, LinePoint.Y)
                 With GLine(i)
-                    '.Visible = msoFalse ' ë””ë²„ê¹… ì¤‘ì—” ë¼ì¸ ì§€ìš°ê¸°
+                    '.Visible = msoFalse ' µğ¹ö±ë Áß¿£ ¶óÀÎ Áö¿ì±â
                     .line.ForeColor.RGB = RGB(0, 0, 0)
                     .line.Weight = 1
                 End With
@@ -338,19 +347,19 @@ Private Function StickerLabelSide(ByRef Xaxis As Single, ByRef Yaxis As Single, 
                                 Optional ByRef BridgeLineWeight As Single, _
                                 Optional ByVal HoleLineDirection As ObjDirection4Way = d4DOWN) As Shape
     
-    Dim LabelPivot As New ObjPivotAxis ' ê°œì²´ì˜ ìƒì„±ì§€ì 
-    Dim Position As New ObjPivotAxis ' ê°œì²´ì˜ ì—°ì‚°ì§€ì 
+    Dim LabelPivot As New ObjPivotAxis ' °³Ã¼ÀÇ »ı¼ºÁöÁ¡
+    Dim Position As New ObjPivotAxis ' °³Ã¼ÀÇ ¿¬»êÁöÁ¡
     
-    Const NormalWidth As Single = 20 ' Begin, End ShapeTypeì˜ ë„ˆë¹„
-    Const Gap As Single = 0 ' ì„¸ë¡œê°„ê²© ìƒìˆ˜
-    Const Spacing As Single = 10 ' ê°€ë¡œê°„ê²© ìƒìˆ˜
+    Const NormalWidth As Single = 20 ' Begin, End ShapeTypeÀÇ ³Êºñ
+    Const Gap As Single = 0 ' ¼¼·Î°£°İ »ó¼ö
+    Const Spacing As Single = 10 ' °¡·Î°£°İ »ó¼ö
     Dim MainTextHeight As Single
     Dim SubTextHeight As Single
-    Dim LabelHeight As Single ' ì¤‘ê°„ Rectangle Shapeì˜ ë†’ì´
-    Dim LabelWidth As Single ' ì¤‘ê°„ Rectangle Shapeì˜ ë„ˆë¹„
+    Dim LabelHeight As Single ' Áß°£ Rectangle ShapeÀÇ ³ôÀÌ
+    Dim LabelWidth As Single ' Áß°£ Rectangle ShapeÀÇ ³Êºñ
     Dim LabelLineWeight(1 To 3) As Single
-    Dim LabelFloor As Long ' SubTexts ê°¯ìˆ˜ë¥¼ ëœ»í•¨. ì˜ˆ) ë©”ì¸í…ìŠ¤íŠ¸(1ë‹¨) = 0, íƒ€ì´í‹€/ë©”ì¸í…ìŠ¤íŠ¸(2ë‹¨) = 1, íƒ€ì´í‹€/ì„¤ëª…//ë©”ì¸í…ìŠ¤íŠ¸(3ë‹¨) = 2
-    Dim Transfer As New ObjPivotAxis ' ì…ë ¥ëœ í…ìŠ¤íŠ¸ë¡œ ë¶€í„° ê°’ì„ ì¶”ì¶œí•´ ë†’ì´, ë„ˆë¹„ ìë™ê³„ì‚°ì„ ìœ„í•œ ì „ë‹¬ìš© ë³€ìˆ˜
+    Dim LabelFloor As Long ' SubTexts °¹¼ö¸¦ ¶æÇÔ. ¿¹) ¸ŞÀÎÅØ½ºÆ®(1´Ü) = 0, Å¸ÀÌÆ²/¸ŞÀÎÅØ½ºÆ®(2´Ü) = 1, Å¸ÀÌÆ²/¼³¸í//¸ŞÀÎÅØ½ºÆ®(3´Ü) = 2
+    Dim Transfer As New ObjPivotAxis ' ÀÔ·ÂµÈ ÅØ½ºÆ®·Î ºÎÅÍ °ªÀ» ÃßÃâÇØ ³ôÀÌ, ³Êºñ ÀÚµ¿°è»êÀ» À§ÇÑ Àü´Ş¿ë º¯¼ö
     
     Dim shp(1 To 10) As Shape
     Dim HoleLine As Shape
@@ -358,22 +367,22 @@ Private Function StickerLabelSide(ByRef Xaxis As Single, ByRef Yaxis As Single, 
     If Not SubTexts Is Nothing Then
         LabelFloor = SubTexts.Count
     End If
-    'ë³€ìˆ˜ì´ˆê¸°í™”
+    'º¯¼öÃÊ±âÈ­
     MainTextHeight = 18
     SubTextHeight = 15
     
-    Set Transfer = GetStringMaxWidthNHeight(MainText, SubTexts) ' ì…ë ¥ëœ í…ìŠ¤íŠ¸ì˜ ìµœëŒ€ ê¸¸ì´ë¥¼ ì°¾ì•„ ë„ˆë¹„ì™€ ë©”ì¸, ì„œë¸Œí…ìŠ¤íŠ¸ì˜ ë†’ì´ë¥¼ ê²°ì •í•¨.
+    Set Transfer = GetStringMaxWidthNHeight(MainText, SubTexts) ' ÀÔ·ÂµÈ ÅØ½ºÆ®ÀÇ ÃÖ´ë ±æÀÌ¸¦ Ã£¾Æ ³Êºñ¿Í ¸ŞÀÎ, ¼­ºêÅØ½ºÆ®ÀÇ ³ôÀÌ¸¦ °áÁ¤ÇÔ.
     SubTextHeight = Transfer.Z
-    MainTextHeight = Transfer.y
-    LabelWidth = Transfer.X + Spacing ' ì¤‘ê°„ Rectangle ì˜ ë„ˆë¹„ ê°’
-    LabelHeight = MainTextHeight + Gap * 2 + (LabelFloor * (SubTextHeight + Gap)) ' ì¤‘ê°„ Rectangle ì˜ ë†’ì´ ê°’
+    MainTextHeight = Transfer.Y
+    LabelWidth = Transfer.X + Spacing ' Áß°£ Rectangle ÀÇ ³Êºñ °ª
+    LabelHeight = MainTextHeight + Gap * 2 + (LabelFloor * (SubTextHeight + Gap)) ' Áß°£ Rectangle ÀÇ ³ôÀÌ °ª
     
     LabelPivot.X = Xaxis
-    LabelPivot.y = Yaxis
+    LabelPivot.Y = Yaxis
     Position.X = LabelPivot.X - NormalWidth / 2 - LabelWidth
-    Position.y = LabelPivot.y - LabelHeight / 2
+    Position.Y = LabelPivot.Y - LabelHeight / 2
     
-    If Position.X <= 0 Or Position.y <= 0 Then
+    If Position.X <= 0 Or Position.Y <= 0 Then
         MsgBox "Position Error"
         Exit Function
     End If
@@ -384,9 +393,9 @@ Private Function StickerLabelSide(ByRef Xaxis As Single, ByRef Yaxis As Single, 
     For i = 1 To 3
         Dim Part As Long
         Part = (i - 1) * 3
-        Set shp(Part + 1) = DrawingWS.Shapes.AddShape(LabelBeginType, Position.X, Position.y, NormalWidth, LabelHeight)
-        Set shp(Part + 2) = DrawingWS.Shapes.AddShape(LabelEndType, Position.X + LabelWidth, Position.y, NormalWidth, LabelHeight)
-        Set shp(Part + 3) = DrawingWS.Shapes.AddShape(msoShapeRectangle, Position.X + (NormalWidth / 2), Position.y, LabelWidth, LabelHeight)
+        Set shp(Part + 1) = DrawingWS.Shapes.AddShape(LabelBeginType, Position.X, Position.Y, NormalWidth, LabelHeight)
+        Set shp(Part + 2) = DrawingWS.Shapes.AddShape(LabelEndType, Position.X + LabelWidth, Position.Y, NormalWidth, LabelHeight)
+        Set shp(Part + 3) = DrawingWS.Shapes.AddShape(msoShapeRectangle, Position.X + (NormalWidth / 2), Position.Y, LabelWidth, LabelHeight)
     Next i
     
     For i = 1 To 3
@@ -420,8 +429,8 @@ Private Function StickerLabelSide(ByRef Xaxis As Single, ByRef Yaxis As Single, 
     HoleSize = 8
     LabelLineWeight(3) = (LabelLineWeight(1) + LabelLineWeight(2)) / 4
     HolePivot.X = LabelPivot.X - HoleSize / 2
-    HolePivot.y = LabelPivot.y - HoleSize / 2
-    Set shp(10) = DrawingWS.Shapes.AddShape(msoShapeOval, HolePivot.X, HolePivot.y, HoleSize, HoleSize)
+    HolePivot.Y = LabelPivot.Y - HoleSize / 2
+    Set shp(10) = DrawingWS.Shapes.AddShape(msoShapeOval, HolePivot.X, HolePivot.Y, HoleSize, HoleSize)
     With shp(10)
         .Fill.ForeColor.RGB = RGB(0, 0, 0)
         .line.Visible = msoFalse
@@ -448,7 +457,7 @@ Private Function StickerLabelSide(ByRef Xaxis As Single, ByRef Yaxis As Single, 
             ElseIf Direction = dsRight Then
                 .Left = LabelPivot.X + NormalWidth / 2
             End If
-            .Top = Position.y + Gap * 2 + (LabelFloor * (SubTextHeight + Gap))
+            .Top = Position.Y + Gap * 2 + (LabelFloor * (SubTextHeight + Gap))
         End With
     
     If Not SubTexts Is Nothing Then
@@ -464,7 +473,7 @@ Private Function StickerLabelSide(ByRef Xaxis As Single, ByRef Yaxis As Single, 
                     ElseIf Direction = dsRight Then
                         .Left = LabelPivot.X + NormalWidth - Spacing
                     End If
-                    .Top = Position.y + Gap * 2 + ((LabelFloor - (LabelFloor - i + 1)) * (SubTextHeight + Gap))
+                    .Top = Position.Y + Gap * 2 + ((LabelFloor - (LabelFloor - i + 1)) * (SubTextHeight + Gap))
                 End With
             Next i
         
@@ -473,11 +482,11 @@ Private Function StickerLabelSide(ByRef Xaxis As Single, ByRef Yaxis As Single, 
             ReDim GLine(1 To LabelFloor) As Shape
             For i = 1 To UBound(GLine)
             If Direction = dsLeft Then
-                Set GLine(i) = DrawingWS.Shapes.AddLine(Position.X + NormalWidth / 2, Position.y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)), _
-                                                LabelPivot.X - Spacing, Position.y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)))
+                Set GLine(i) = DrawingWS.Shapes.AddLine(Position.X + NormalWidth / 2, Position.Y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)), _
+                                                LabelPivot.X - Spacing, Position.Y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)))
             ElseIf Direction = dsRight Then
-                Set GLine(i) = DrawingWS.Shapes.AddLine(LabelPivot.X + NormalWidth / 2, Position.y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)), _
-                                                LabelPivot.X + LabelWidth, Position.y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)))
+                Set GLine(i) = DrawingWS.Shapes.AddLine(LabelPivot.X + NormalWidth / 2, Position.Y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)), _
+                                                LabelPivot.X + LabelWidth, Position.Y + Gap / 2 + (((LabelFloor + 1) - i) * (SubTextHeight + Gap)))
             End If
                 With GLine(i)
                     .line.ForeColor.RGB = RGB(0, 0, 0)
@@ -528,11 +537,11 @@ End Function
 Private Function GetStringMaxWidthNHeight(MainText As String, SubTexts As Collection) As ObjPivotAxis
     Dim longestText As String
     Dim TextBox As Shape
-    Dim result As New ObjPivotAxis
+    Dim Result As New ObjPivotAxis
     
-    ' ê°€ì¥ ê¸´ í…ìŠ¤íŠ¸ ì°¾ê¸°
-    longestText = MainText ' ìš°ì„  MainTextë¥¼ ê°€ì¥ ê¸´ í…ìŠ¤íŠ¸ë¡œ ê°€ì •
-    MainOrSub = True ' MainTextê°€ ê¸°ë³¸ì ìœ¼ë¡œ ê°€ì¥ ê¸¸ë‹¤ê³  ê°€ì •
+    ' °¡Àå ±ä ÅØ½ºÆ® Ã£±â
+    longestText = MainText ' ¿ì¼± MainText¸¦ °¡Àå ±ä ÅØ½ºÆ®·Î °¡Á¤
+    MainOrSub = True ' MainText°¡ ±âº»ÀûÀ¸·Î °¡Àå ±æ´Ù°í °¡Á¤
     
     If Not SubTexts Is Nothing Then
         For Each Item In SubTexts
@@ -540,23 +549,23 @@ Private Function GetStringMaxWidthNHeight(MainText As String, SubTexts As Collec
         Next Item
     End If
 
-    ' MainTextì˜ TextBox ì„¤ì • ë° ë„ˆë¹„, ë†’ì´ ì¸¡ì •
+    ' MainTextÀÇ TextBox ¼³Á¤ ¹× ³Êºñ, ³ôÀÌ ÃøÁ¤
     Set TextBox = DrawingWS.Shapes.AddLabel(msoTextOrientationHorizontal, 0, 0, 0, 0)
     Call ApplyMainTextBoxSettings(TextBox, MainText)
-    result.y = TextBox.Height ' MainTextì˜ ë†’ì´
-    result.X = TextBox.Width ' MainTextê°€ ê°€ì¥ ê¸¸ë‹¤ê³  ê°€ì •í•˜ê³  ì§€ì •
+    Result.Y = TextBox.Height ' MainTextÀÇ ³ôÀÌ
+    Result.X = TextBox.Width ' MainText°¡ °¡Àå ±æ´Ù°í °¡Á¤ÇÏ°í ÁöÁ¤
     TextBox.Delete
 
-    ' SubTextsì˜ TextBox ì„¤ì • ë° ë„ˆë¹„, ë†’ì´ ì¸¡ì • (MainTextê°€ ê°€ì¥ ê¸¸ì§€ ì•Šì€ ê²½ìš°)
+    ' SubTextsÀÇ TextBox ¼³Á¤ ¹× ³Êºñ, ³ôÀÌ ÃøÁ¤ (MainText°¡ °¡Àå ±æÁö ¾ÊÀº °æ¿ì)
     If Not SubTexts Is Nothing Then
         Set TextBox = DrawingWS.Shapes.AddLabel(msoTextOrientationHorizontal, 0, 0, 0, 0)
         Call ApplySubTextBoxSettings(TextBox, longestText)
-        If TextBox.Width > result.X Then result.X = TextBox.Width        ' SubText ì¤‘ ê°€ì¥ ê¸´ í…ìŠ¤íŠ¸ì˜ ë„ˆë¹„
-        result.Z = TextBox.Height ' SubText ì¤‘ ê°€ì¥ ê¸´ í…ìŠ¤íŠ¸ì˜ ë†’ì´
+        If TextBox.Width > Result.X Then Result.X = TextBox.Width        ' SubText Áß °¡Àå ±ä ÅØ½ºÆ®ÀÇ ³Êºñ
+        Result.Z = TextBox.Height ' SubText Áß °¡Àå ±ä ÅØ½ºÆ®ÀÇ ³ôÀÌ
         TextBox.Delete
     End If
 
-    Set GetStringMaxWidthNHeight = result
+    Set GetStringMaxWidthNHeight = Result
 End Function
 
 Private Sub ApplyMainTextBoxSettings(ByRef TextBox As Shape, ByRef text As String, _
@@ -566,7 +575,7 @@ Private Sub ApplyMainTextBoxSettings(ByRef TextBox As Shape, ByRef text As Strin
         .TextFrame.AutoSize = True
         .TextFrame2.WordWrap = msoFalse
         .TextFrame.Characters.text = text
-        .TextFrame.Characters.Font.Name = "LGìŠ¤ë§ˆíŠ¸ì²´2.0 Bold"
+        .TextFrame.Characters.Font.Name = "LG½º¸¶Æ®Ã¼2.0 Bold"
         .TextFrame.Characters.Font.Size = 17
         .TextFrame.Characters.Font.Bold = msoTrue
         .TextFrame.HorizontalAlignment = xlHAlignCenter
@@ -584,7 +593,7 @@ Private Sub ApplySubTextBoxSettings(ByRef TextBox As Shape, ByRef text As String
         .TextFrame.AutoSize = True
         .TextFrame2.WordWrap = msoFalse
         .TextFrame.Characters.text = text
-        .TextFrame.Characters.Font.Name = "LGìŠ¤ë§ˆíŠ¸ì²´2.0 SemiBold"
+        .TextFrame.Characters.Font.Name = "LG½º¸¶Æ®Ã¼2.0 SemiBold"
         .TextFrame.Characters.Font.Size = 15
         .TextFrame.Characters.Font.Bold = msoFalse
         .TextFrame.HorizontalAlignment = xlHAlignLeft
@@ -608,7 +617,7 @@ Private Function PivotHoleNLineDirection(ByRef HolePivot As ObjPivotAxis, ByRef 
     
     For i = 1 To 2
         Pivot(i).X = HolePivot.X - Size(i) / 2
-        Pivot(i).y = HolePivot.y - Size(i) / 2
+        Pivot(i).Y = HolePivot.Y - Size(i) / 2
     Next i
     
     With TargetShape
@@ -616,33 +625,33 @@ Private Function PivotHoleNLineDirection(ByRef HolePivot As ObjPivotAxis, ByRef 
         Select Case LineDirection
         Case d4UP
             Pivot(3).X = HolePivot.X
-            Pivot(3).y = .Top - LineWeight / 2
+            Pivot(3).Y = .Top - LineWeight / 2
         Case d4DOWN
             Pivot(3).X = HolePivot.X
-            Pivot(3).y = .Top + .Height + LineWeight / 2
+            Pivot(3).Y = .Top + .Height + LineWeight / 2
         Case d4LEFT
             Pivot(3).X = .Left - LineWeight / 2
-            Pivot(3).y = HolePivot.y
+            Pivot(3).Y = HolePivot.Y
         Case d4RIGHT
             Pivot(3).X = .Left + .Width + LineWeight / 2
-            Pivot(3).y = HolePivot.y
+            Pivot(3).Y = HolePivot.Y
         End Select
         
     End With
     
-    Set shp(1) = DrawingWS.Shapes.AddShape(msoShapeOval, Pivot(1).X, Pivot(1).y, Size(1), Size(1))
+    Set shp(1) = DrawingWS.Shapes.AddShape(msoShapeOval, Pivot(1).X, Pivot(1).Y, Size(1), Size(1))
     With shp(1)
         .Fill.ForeColor.RGB = RGB(255, 255, 255)
         .line.Visible = msoFalse
     End With
     
-    Set shp(2) = DrawingWS.Shapes.AddShape(msoShapeOval, Pivot(2).X, Pivot(2).y, Size(2), Size(2))
+    Set shp(2) = DrawingWS.Shapes.AddShape(msoShapeOval, Pivot(2).X, Pivot(2).Y, Size(2), Size(2))
     With shp(2)
         .Fill.ForeColor.RGB = RGB(0, 0, 0)
         .line.Visible = msoFalse
     End With
     
-    Set shp(3) = DrawingWS.Shapes.AddLine(HolePivot.X, HolePivot.y, Pivot(3).X, Pivot(3).y)
+    Set shp(3) = DrawingWS.Shapes.AddLine(HolePivot.X, HolePivot.Y, Pivot(3).X, Pivot(3).Y)
     With shp(3)
         .line.ForeColor.RGB = RGB(0, 0, 0)
         .line.Weight = BorderWeight

@@ -1,3 +1,4 @@
+Attribute VB_Name = "Fillter"
 Sub AutoFilltering_BOM(ws As Worksheet, FillteringCol As Collection)
     
     Dim FirstCol As Long

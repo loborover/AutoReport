@@ -1,3 +1,18 @@
+VERSION 5.00
+Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} BCCUF 
+   Caption         =   "Back Color Controller"
+   ClientHeight    =   4845
+   ClientLeft      =   45
+   ClientTop       =   390
+   ClientWidth     =   6645
+   OleObjectBlob   =   "BCCUF.frx":0000
+   StartUpPosition =   1  '¼ÒÀ¯ÀÚ °¡¿îµ¥
+End
+Attribute VB_Name = "BCCUF"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = False
 Private Const Color_Inversion_Criterion As Long = 204
 Private pvRGB(1 To 2) As New ObjPivotAxis
 Private Sub Userform_Initialize()
@@ -12,11 +27,11 @@ End Property
 Private Sub Userform_Terminate()
     AutoReportHandler.Doc_BackColor = pvRGB(1)
     With pvRGB(1)
-        AutoReportHandler.BackColor_TB.BackColor = RGB(.X, .y, .Z)
+        AutoReportHandler.BackColor_TB.BackColor = RGB(.X, .Y, .Z)
     End With
 End Sub
 Private Sub Bright_TB_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-    If KeyCode = vbKeyReturn Then ' ì—”í„° í‚¤ ìž…ë ¥ ì‹œ
+    If KeyCode = vbKeyReturn Then ' ¿£ÅÍ Å° ÀÔ·Â ½Ã
         Dim inputStr As String
         Dim numericVal As Long
         Dim scaledVal As Long
@@ -40,11 +55,11 @@ Private Sub Bright_TB_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shif
         Bright_Slidebar.value = scaledVal
         Call Bright_Slidebar_Change
 
-        KeyCode = 0 ' ì‚‘ ì†Œë¦¬ ë°©ì§€
+        KeyCode = 0 ' »à ¼Ò¸® ¹æÁö
     End If
 End Sub
 Private Sub BCR_TB_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-    If KeyCode = vbKeyReturn Then ' ì—”í„° í‚¤ ìž…ë ¥ ì‹œ
+    If KeyCode = vbKeyReturn Then ' ¿£ÅÍ Å° ÀÔ·Â ½Ã
         Dim inputStr As String
         Dim numericVal As Long
         Dim scaledVal As Long
@@ -68,11 +83,11 @@ Private Sub BCR_TB_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift A
         BCR_Slidebar.value = scaledVal
         Call BCR_Slidebar_Change
 
-        KeyCode = 0 ' ì‚‘ ì†Œë¦¬ ë°©ì§€
+        KeyCode = 0 ' »à ¼Ò¸® ¹æÁö
     End If
 End Sub
 Private Sub BCG_TB_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-    If KeyCode = vbKeyReturn Then ' ì—”í„° í‚¤ ìž…ë ¥ ì‹œ
+    If KeyCode = vbKeyReturn Then ' ¿£ÅÍ Å° ÀÔ·Â ½Ã
         Dim inputStr As String
         Dim numericVal As Long
         Dim scaledVal As Long
@@ -96,11 +111,11 @@ Private Sub BCG_TB_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift A
         BCG_Slidebar.value = scaledVal
         Call BCG_Slidebar_Change
 
-        KeyCode = 0 ' ì‚‘ ì†Œë¦¬ ë°©ì§€
+        KeyCode = 0 ' »à ¼Ò¸® ¹æÁö
     End If
 End Sub
 Private Sub BCB_TB_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-    If KeyCode = vbKeyReturn Then ' ì—”í„° í‚¤ ìž…ë ¥ ì‹œ
+    If KeyCode = vbKeyReturn Then ' ¿£ÅÍ Å° ÀÔ·Â ½Ã
         Dim inputStr As String
         Dim numericVal As Long
         Dim scaledVal As Long
@@ -124,7 +139,7 @@ Private Sub BCB_TB_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift A
         BCB_Slidebar.value = scaledVal
         Call BCB_Slidebar_Change
 
-        KeyCode = 0 ' ì‚‘ ì†Œë¦¬ ë°©ì§€
+        KeyCode = 0 ' »à ¼Ò¸® ¹æÁö
     End If
 End Sub
 
@@ -150,11 +165,11 @@ Private Sub BCR_Slidebar_Change()
     Update_Colors
 End Sub
 Private Sub BCG_Slidebar_Change()
-    pvRGB(1).y = BCG_Slidebar.value
-    BCG_TB.text = Format((pvRGB(1).y / 255 * 100), "0.0") & "%"
-    BCG_TB.BackColor = RGB(0, pvRGB(1).y, 0)
-    BCG_Slidebar.SelLength = pvRGB(1).y
-    If pvRGB(1).y < Color_Inversion_Criterion Then
+    pvRGB(1).Y = BCG_Slidebar.value
+    BCG_TB.text = Format((pvRGB(1).Y / 255 * 100), "0.0") & "%"
+    BCG_TB.BackColor = RGB(0, pvRGB(1).Y, 0)
+    BCG_Slidebar.SelLength = pvRGB(1).Y
+    If pvRGB(1).Y < Color_Inversion_Criterion Then
         BCG_TB.ForeColor = RGB(255, 255, 255)
     Else
         BCG_TB.ForeColor = RGB(0, 0, 0)
@@ -175,7 +190,7 @@ Private Sub BCB_Slidebar_Change()
 End Sub
 Private Sub Update_Colors()
     With pvRGB(1)
-        Test_TB.BackColor = RGB(.X, .y, .Z)
+        Test_TB.BackColor = RGB(.X, .Y, .Z)
     End With
     Set pvRGB(2) = pvRGB(1).Copy
 End Sub

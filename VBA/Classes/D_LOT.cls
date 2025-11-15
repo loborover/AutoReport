@@ -1,13 +1,22 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "D_LOT"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 Option Explicit
 
 Private vLot_info As New Collection
 Private vStart As Range, vEnd As Range
 
-'ì´ˆê¸°í™” ì´ë²¤íŠ¸ ë©”ì„œë“œ
+'ÃÊ±âÈ­ ÀÌº¥Æ® ¸Ş¼­µå
 'Private Sub Class_Initialize()
 '
 'End Sub
-'ì†Œë©¸ ì´ë²¤íŠ¸ ë©”ì„œë“œ
+'¼Ò¸ê ÀÌº¥Æ® ¸Ş¼­µå
 'Private Sub Class_Terminate()
 '
 'End Sub
@@ -16,10 +25,10 @@ Public Property Get ModelCount() As Long
 End Property
 Public Property Get Lot_Range() As Range
     If vStart Is Nothing Or vEnd Is Nothing Then
-        Err.Raise 9998, , "Start, End ì°¸ì¡° ì˜¤ë¥˜"
+        Err.Raise 9998, , "Start, End ÂüÁ¶ ¿À·ù"
         Exit Property
     ElseIf Not vStart.Worksheet Is vEnd.Worksheet Then
-        Err.Raise 9999, , "Startì™€ EndëŠ” ë™ì¼í•œ ì‹œíŠ¸ì— ìˆì–´ì•¼ í•©ë‹ˆë‹¤."
+        Err.Raise 9999, , "Start¿Í End´Â µ¿ÀÏÇÑ ½ÃÆ®¿¡ ÀÖ¾î¾ß ÇÕ´Ï´Ù."
         Exit Property
     End If
     Set Lot_Range = vStart.Worksheet.Range(vStart, vEnd)
@@ -50,9 +59,9 @@ Public Function Copy() As D_LOT
     End With
     Set Copy = CopiedData
 End Function
-Public Function info(Optional index As Long = 1) As ModelInfo
-    If vLot_info(index) Is Nothing Then Exit Function
-    Set info = vLot_info(index)
+Public Function info(Optional Index As Long = 1) As ModelInfo
+    If vLot_info(Index) Is Nothing Then Exit Function
+    Set info = vLot_info(Index)
 End Function
 
 Private Sub ParseModelinfo()

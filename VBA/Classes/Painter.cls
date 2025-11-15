@@ -1,15 +1,24 @@
-'ì›Œí¬ì‹œíŠ¸ì— ê·¸ë¦¼ ì •ë³´ë¥¼ ì‚¬ìš©í•´ì•¼ í•  ë•Œ, ìµœì¢…ì¶œë ¥ìš© ê·¸ë¦¼ ê¸°ëŠ¥ì„ ëª¨ì•„ë‘” í´ë˜ìŠ¤
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "Painter"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+'¿öÅ©½ÃÆ®¿¡ ±×¸² Á¤º¸¸¦ »ç¿ëÇØ¾ß ÇÒ ¶§, ÃÖÁ¾Ãâ·Â¿ë ±×¸² ±â´ÉÀ» ¸ğ¾ÆµĞ Å¬·¡½º
 
 Private DrawingWS As Worksheet
 Private clsStickerLabel As StickerLabel
 Private vLineWeight As Single
-' Utillity ëª¨ë“ˆì— Enum ì„ ì–¸í•¨
+' Utillity ¸ğµâ¿¡ Enum ¼±¾ğÇÔ
 
-'ì´ˆê¸°í™” ì´ë²¤íŠ¸ ë©”ì„œë“œ
+'ÃÊ±âÈ­ ÀÌº¥Æ® ¸Ş¼­µå
 Private Sub Class_Initialize()
     Set clsStickerLabel = New StickerLabel
 End Sub
-'ì†Œë©¸ ì´ë²¤íŠ¸ ë©”ì„œë“œ
+'¼Ò¸ê ÀÌº¥Æ® ¸Ş¼­µå
 Private Sub Class_Terminate()
     Set clsStickerLabel = Nothing
 End Sub
@@ -31,16 +40,16 @@ Public Sub DrawShape(ShapeType As MsoAutoShapeType, _
     
     With TargetCell
         Pivot.X = (.Left + (.Width * 4 / 5)) - Size / 2
-        Pivot.y = (.Top + (.Height / 2)) - Size / 2
+        Pivot.Y = (.Top + (.Height / 2)) - Size / 2
     End With
     
-    With DrawingWS.Shapes.AddShape(ShapeType, Pivot.X, Pivot.y, Size, Size)
+    With DrawingWS.Shapes.AddShape(ShapeType, Pivot.X, Pivot.Y, Size, Size)
         .Fill.ForeColor.RGB = RGB(0, 0, 0)
         .line.ForeColor.RGB = RGB(255, 255, 255)
         .line.Weight = 1
     End With
 End Sub
-' ì˜¤ë°œ ë¸Œë¦¿ì§€ ìŠ¤í‹°ì»¤ë¼ë²¨
+' ¿À¹ß ºê¸´Áö ½ºÆ¼Ä¿¶óº§
 Public Function OvalBridge(StartCell As Range, EndCell As Range, _
                     Optional ByVal SplitRate_Horizon As Long = 7, _
                     Optional ByVal SplitRate_Vertical As Long = 50, _
@@ -61,7 +70,7 @@ Public Function OvalBridge(StartCell As Range, EndCell As Range, _
     Dim ColDiff As Long, RowDiff As Long, SpLev_Horizon As Long, vtclsplt_Start As Long, vtclsplt_End As Long, vIM As Long
     Dim ForGroup(1 To 2) As String
     
-    If SplitRate_Vertical < 1 Or SplitRate_Vertical > 100 Then Debug.Print "Err.Out of 1-100": Exit Function ' Error ì„ ë³„
+    If SplitRate_Vertical < 1 Or SplitRate_Vertical > 100 Then Debug.Print "Err.Out of 1-100": Exit Function ' Error ¼±º°
     Select Case VerticalSplitDirection
     Case Is = -48 ' Both Side
         vtclsplt_Start = SplitRate_Vertical: vtclsplt_End = SplitRate_Vertical
@@ -74,7 +83,7 @@ Public Function OvalBridge(StartCell As Range, EndCell As Range, _
     End Select
     SpLev_Horizon = SplitRate_Horizon - 1
     ColDiff = EndCell.Column - StartCell.Column: RowDiff = EndCell.Row - StartCell.Row
-    If MainText = "" Or MainText = "0" Then Exit Function ' MainTextì˜ ë‚´ìš©ì´ ì•„ì˜ˆ ë¹„ì–´ ìˆìœ¼ë©´ ì¶œë ¥ ì•ˆí•¨
+    If MainText = "" Or MainText = "0" Then Exit Function ' MainTextÀÇ ³»¿ëÀÌ ¾Æ¿¹ ºñ¾î ÀÖÀ¸¸é Ãâ·Â ¾ÈÇÔ
 
     With StartCell
         If Direction = dsLeft Then
@@ -82,7 +91,7 @@ Public Function OvalBridge(StartCell As Range, EndCell As Range, _
         ElseIf Direction = dsRight Then
             StartPivot.X = (.Left + (.Width * 1 / SplitRate_Horizon)) - (OvalSize / 2)
         End If
-        StartPivot.y = (.Top + (.Height * vtclsplt_Start / 100)) - (OvalSize / 2)
+        StartPivot.Y = (.Top + (.Height * vtclsplt_Start / 100)) - (OvalSize / 2)
     End With
     
     With EndCell
@@ -91,61 +100,61 @@ Public Function OvalBridge(StartCell As Range, EndCell As Range, _
         ElseIf Direction = dsRight Then
             EndPivot.X = (.Left + (.Width * 1 / SplitRate_Horizon)) - (OvalSize / 2)
         End If
-        EndPivot.y = (.Top + (.Height * (100 - vtclsplt_End) / 100)) - (OvalSize / 2)
+        EndPivot.Y = (.Top + (.Height * (100 - vtclsplt_End) / 100)) - (OvalSize / 2)
     End With
     
-    If ColDiff < 0 Then ' ìš°í–¥íƒ€ì¼ ê²½ìš° ì ìš©
-        ForGroup(1) = Bridge(DrawOval(EndPivot.X, EndPivot.y, OvalSize), DrawOval(StartPivot.X, StartPivot.y, OvalSize), _
+    If ColDiff < 0 Then ' ¿ìÇâÅ¸ÀÏ °æ¿ì Àû¿ë
+        ForGroup(1) = Bridge(DrawOval(EndPivot.X, EndPivot.Y, OvalSize), DrawOval(StartPivot.X, StartPivot.Y, OvalSize), _
             LineLength, LineWeight, Direction).Name
-    Else ' ì¢Œí–¥íƒ€ì¼ ê²½ìš° ì ìš©
-        ForGroup(1) = Bridge(DrawOval(StartPivot.X, StartPivot.y, OvalSize), DrawOval(EndPivot.X, EndPivot.y, OvalSize), _
+    Else ' ÁÂÇâÅ¸ÀÏ °æ¿ì Àû¿ë
+        ForGroup(1) = Bridge(DrawOval(StartPivot.X, StartPivot.Y, OvalSize), DrawOval(EndPivot.X, EndPivot.Y, OvalSize), _
             LineLength, LineWeight, Direction).Name
     End If
     
-' ë¼ë²¨ Start - End í–‰ ì°¨ì´ê°€ 1ì´í•˜ì¼ ê²½ìš°, ì‹±ê¸€ë¼ë²¨
-' ë¼ë²¨ Start - End í–‰ ì°¨ì´ê°€ 1ì´ˆê³¼ì¼ ê²½ìš° And Start End ì—´ ì¼ì¹˜, ì¼ë°˜ë¼ë²¨
-If SLabelMod Then RowDiff = 0 ' ì‹±ê¸€ë¼ë²¨ ëª¨ë“œì¼ ë•Œ ë¬´ì¡°ê±´ 0ìœ¼ë¡œ ë§Œë“¤ê¸°
-Const LRGM As Long = 2 ' Label Row Gap Minimum ìµœì†Œ í–‰ ì°¨ì´ ìˆ˜
+' ¶óº§ Start - End Çà Â÷ÀÌ°¡ 1ÀÌÇÏÀÏ °æ¿ì, ½Ì±Û¶óº§
+' ¶óº§ Start - End Çà Â÷ÀÌ°¡ 1ÃÊ°úÀÏ °æ¿ì And Start End ¿­ ÀÏÄ¡, ÀÏ¹İ¶óº§
+If SLabelMod Then RowDiff = 0 ' ½Ì±Û¶óº§ ¸ğµåÀÏ ¶§ ¹«Á¶°Ç 0À¸·Î ¸¸µé±â
+Const LRGM As Long = 2 ' Label Row Gap Minimum ÃÖ¼Ò Çà Â÷ÀÌ ¼ö
 'vIM = IIf(InnerMod, -1, 1)
 Select Case RowDiff
-Case Is <= LRGM ' í–‰ ì°¨ì´ê°€ 1ì´í•˜ = 2ì…€ ì´í•˜ / ì‹±ê¸€ë¼ë²¨
+Case Is <= LRGM ' Çà Â÷ÀÌ°¡ 1ÀÌÇÏ = 2¼¿ ÀÌÇÏ / ½Ì±Û¶óº§
     If ColDiff < 0 Then
-        If Direction = dsLeft Then LabelPivot.X = EndPivot.X - LineLength + OvalSize / 2 ' ì¢Œí–¥ì‹œ ìƒì„±ì§€ì  ì¡°ì •
-        If Direction = dsRight Then LabelPivot.X = StartPivot.X - LineLength + OvalSize / 2 ' ìš°í–¥ì‹œ ìƒì„±ì§€ì  ì¡°ì •
+        If Direction = dsLeft Then LabelPivot.X = EndPivot.X - LineLength + OvalSize / 2 ' ÁÂÇâ½Ã »ı¼ºÁöÁ¡ Á¶Á¤
+        If Direction = dsRight Then LabelPivot.X = StartPivot.X - LineLength + OvalSize / 2 ' ¿ìÇâ½Ã »ı¼ºÁöÁ¡ Á¶Á¤
     Else
-        If Direction = dsLeft Then LabelPivot.X = StartPivot.X - LineLength + OvalSize / 2 ' ì¢Œí–¥ì‹œ ìƒì„±ì§€ì  ì¡°ì •
-        If Direction = dsRight Then LabelPivot.X = EndPivot.X - LineLength + OvalSize / 2 ' ìš°í–¥ì‹œ ìƒì„±ì§€ì  ì¡°ì •
+        If Direction = dsLeft Then LabelPivot.X = StartPivot.X - LineLength + OvalSize / 2 ' ÁÂÇâ½Ã »ı¼ºÁöÁ¡ Á¶Á¤
+        If Direction = dsRight Then LabelPivot.X = EndPivot.X - LineLength + OvalSize / 2 ' ¿ìÇâ½Ã »ı¼ºÁöÁ¡ Á¶Á¤
     End If
-    LabelPivot.y = EndPivot.y - (EndPivot.y - StartPivot.y) / 2 + OvalSize / 2
-    ForGroup(2) = Me.StickerLabel.SingleLabel(LabelPivot.X, LabelPivot.y, MainText:=MainText, Direction:=Direction).Name
-Case Is > LRGM ' í–‰ ì°¨ì´ê°€ 1ì´ˆê³¼ = 2ì…€ ì´ìƒ
+    LabelPivot.Y = EndPivot.Y - (EndPivot.Y - StartPivot.Y) / 2 + OvalSize / 2
+    ForGroup(2) = Me.StickerLabel.SingleLabel(LabelPivot.X, LabelPivot.Y, MainText:=MainText, Direction:=Direction).Name
+Case Is > LRGM ' Çà Â÷ÀÌ°¡ 1ÃÊ°ú = 2¼¿ ÀÌ»ó
     Select Case Direction
     Case dsLeft
         If ColDiff < 0 Then
             LabelPivot.X = EndPivot.X - LineLength + OvalSize / 2
-            LabelPivot.y = EndPivot.y - (EndPivot.y - StartPivot.y) / 2 + OvalSize / 2
+            LabelPivot.Y = EndPivot.Y - (EndPivot.Y - StartPivot.Y) / 2 + OvalSize / 2
         Else
             LabelPivot.X = StartPivot.X - LineLength + OvalSize / 2
-            LabelPivot.y = EndPivot.y - (EndPivot.y - StartPivot.y) / 2 + OvalSize / 2
+            LabelPivot.Y = EndPivot.Y - (EndPivot.Y - StartPivot.Y) / 2 + OvalSize / 2
         End If
     
-        ForGroup(2) = Me.StickerLabel.Left(LabelPivot.X, LabelPivot.y, HoleLineDirection:=HoleLineDirection, BridgeLineWeight:=LineWeight, _
+        ForGroup(2) = Me.StickerLabel.Left(LabelPivot.X, LabelPivot.Y, HoleLineDirection:=HoleLineDirection, BridgeLineWeight:=LineWeight, _
                                 BorderWeight:=BorderWeight, MainText:=MainText, SubTexts:=SubTexts, LabelBeginType:=LabelBeginType, LabelEndType:=LabelEndType).Name
     Case dsRight
         If ColDiff < 0 Then
             LabelPivot.X = StartPivot.X - LineLength + OvalSize / 2
-            LabelPivot.y = EndPivot.y - (EndPivot.y - StartPivot.y) / 2 + OvalSize / 2
+            LabelPivot.Y = EndPivot.Y - (EndPivot.Y - StartPivot.Y) / 2 + OvalSize / 2
         Else
             LabelPivot.X = EndPivot.X - LineLength + OvalSize / 2
-            LabelPivot.y = EndPivot.y - (EndPivot.y - StartPivot.y) / 2 + OvalSize / 2
+            LabelPivot.Y = EndPivot.Y - (EndPivot.Y - StartPivot.Y) / 2 + OvalSize / 2
         End If
     
-        ForGroup(2) = Me.StickerLabel.Right(LabelPivot.X, LabelPivot.y, HoleLineDirection:=HoleLineDirection, BridgeLineWeight:=LineWeight, _
+        ForGroup(2) = Me.StickerLabel.Right(LabelPivot.X, LabelPivot.Y, HoleLineDirection:=HoleLineDirection, BridgeLineWeight:=LineWeight, _
                                 BorderWeight:=BorderWeight, MainText:=MainText, SubTexts:=SubTexts, LabelBeginType:=LabelBeginType, LabelEndType:=LabelEndType).Name
     End Select
 End Select
     
-    Set OvalBridge = DrawingWS.Shapes.Range(ForGroup).Group 'Grouping ì½”ë“œ
+    Set OvalBridge = DrawingWS.Shapes.Range(ForGroup).Group 'Grouping ÄÚµå
     
 End Function
 Public Function DotMacker(ByRef Target As Range, Optional Size As Single = 2, _
@@ -167,16 +176,16 @@ End Function
 
 Private Function DrawOval(ByVal Xaxis As Single, ByVal Yaxis As Single, _
                 Optional ByRef Size As Single = 2) As Shape
-    Dim result As Shape
-    Set result = DrawingWS.Shapes.AddShape(msoShapeOval, Xaxis, Yaxis, Size, Size)
+    Dim Result As Shape
+    Set Result = DrawingWS.Shapes.AddShape(msoShapeOval, Xaxis, Yaxis, Size, Size)
     
-    With result
+    With Result
         .Fill.ForeColor.RGB = RGB(0, 0, 0)
         .line.ForeColor.RGB = RGB(255, 255, 255)
         .line.Weight = 1
     End With
     
-    Set DrawOval = result
+    Set DrawOval = Result
 End Function
 
 Private Function Bridge(StartShp As Shape, EndShp As Shape, _
@@ -191,10 +200,10 @@ Private Function Bridge(StartShp As Shape, EndShp As Shape, _
         Select Case Direction
         Case dsLeft
             StartShape.X = .Width / 2 + .Left 'X
-            StartShape.y = .Height / 2 + .Top 'Y
+            StartShape.Y = .Height / 2 + .Top 'Y
         Case dsRight
             EndShape.X = .Width / 2 + .Left 'X
-            EndShape.y = .Height / 2 + .Top 'Y
+            EndShape.Y = .Height / 2 + .Top 'Y
         End Select
     End With
     
@@ -202,17 +211,17 @@ Private Function Bridge(StartShp As Shape, EndShp As Shape, _
         Select Case Direction
         Case dsLeft
             EndShape.X = .Width / 2 + .Left 'X
-            EndShape.y = .Height / 2 + .Top 'Y
+            EndShape.Y = .Height / 2 + .Top 'Y
         Case dsRight
             StartShape.X = .Width / 2 + .Left 'X
-            StartShape.y = .Height / 2 + .Top 'Y
+            StartShape.Y = .Height / 2 + .Top 'Y
         End Select
     End With
     
     If Direction = dsRight Then Length = Length * -1
-    Set Liner(1) = DrawingWS.Shapes.AddLine(StartShape.X, StartShape.y, StartShape.X - Length, StartShape.y)
-    Set Liner(2) = DrawingWS.Shapes.AddLine(StartShape.X - Length, StartShape.y, StartShape.X - Length, EndShape.y)
-    Set Liner(3) = DrawingWS.Shapes.AddLine(StartShape.X - Length, EndShape.y, EndShape.X, EndShape.y)
+    Set Liner(1) = DrawingWS.Shapes.AddLine(StartShape.X, StartShape.Y, StartShape.X - Length, StartShape.Y)
+    Set Liner(2) = DrawingWS.Shapes.AddLine(StartShape.X - Length, StartShape.Y, StartShape.X - Length, EndShape.Y)
+    Set Liner(3) = DrawingWS.Shapes.AddLine(StartShape.X - Length, EndShape.Y, EndShape.X, EndShape.Y)
     
     For i = 1 To 3
         With Liner(i).line
@@ -240,7 +249,7 @@ Private Function TitleCollecting(ByRef T1 As String, ByRef T2 As String, ByRef T
         If Not T3 = "" Then Prcss.Add T3
     Set TitleCollecting = Prcss
 End Function
-' ë¯¸ë¦¬ ì„¤ì •ëœ ë°ì´í„° êµ¬ì¡°ì— ë”°ë¼ OvalBridge ì‹œì‘ì§€ì , ëì§€ì  ì¢Œí‘œë¥¼ ì°ì–´ì£¼ëŠ” Function
+' ¹Ì¸® ¼³Á¤µÈ µ¥ÀÌÅÍ ±¸Á¶¿¡ µû¶ó OvalBridge ½ÃÀÛÁöÁ¡, ³¡ÁöÁ¡ ÁÂÇ¥¸¦ Âï¾îÁÖ´Â Function
 Private Function Stamp_it(ByRef StartR As Range, ByRef EndR As Range, _
                     Optional ByVal Label_Side As ObjDirectionSide = dsLeft, _
                     Optional ByVal SingleLabelMod As Boolean = False, _
@@ -253,13 +262,13 @@ Private Function Stamp_it(ByRef StartR As Range, ByRef EndR As Range, _
     Dim F_StartR As Range, F_EndR As Range ' Final Start and End Range
     Dim StartRowCount As Long, EndRowCount As Long
 
-    ' ê¸°ë³¸ ë°ì´í„° ì„¤ì •
+    ' ±âº» µ¥ÀÌÅÍ ¼³Á¤
     RowDiff = EndR.Row - StartR.Row
     ColDiff = EndR.Column - StartR.Column
     If MainT = "" Then MainT = Application.WorksheetFunction.Sum(Range(StartR, EndR))
-    ColOff = IIf(Label_Side = dsRight, 1, -1) ' ë¼ë²¨ ë°©í–¥ ì„¤ì •
+    ColOff = IIf(Label_Side = dsRight, 1, -1) ' ¶óº§ ¹æÇâ ¼³Á¤
 
-    ' ë‹¨ì¼ ì…€ ì²˜ë¦¬ (ì  ì°ê¸°)
+    ' ´ÜÀÏ ¼¿ Ã³¸® (Á¡ Âï±â)
     If RowDiff = 0 And ColDiff = 0 Then
         Me.DotMacker StartR.Offset(0, 1), 5
         Exit Function
@@ -268,7 +277,7 @@ Private Function Stamp_it(ByRef StartR As Range, ByRef EndR As Range, _
     StartRowCount = Utillity.fCCNEC(Range(StartR, StartR.Offset(0, ColDiff)))
     EndRowCount = Utillity.fCCNEC(Range(EndR, EndR.Offset(0, -ColDiff)))
 
-    ' SRRC, ERRC ìµœì í™” (ë¶ˆí•„ìš”í•œ ì¤‘ì²© ì œê±°)
+    ' SRRC, ERRC ÃÖÀûÈ­ (ºÒÇÊ¿äÇÑ ÁßÃ¸ Á¦°Å)
     If StartRowCount > 1 Then
         SRRC = IIf((ColDiff > 0 And Label_Side = dsRight) Or (ColDiff < 0 And Label_Side = dsLeft), StartRowCount * ColOff, ColOff)
         ERRC = IIf((ColDiff > 0 And Label_Side = dsLeft) Or (ColDiff < 0 And Label_Side = dsRight), EndRowCount * ColOff, ColOff)
@@ -280,11 +289,11 @@ Private Function Stamp_it(ByRef StartR As Range, ByRef EndR As Range, _
         ERRC = EndRowCount * ColOff
     End If
 
-    ' ìµœì¢… ìœ„ì¹˜ ì„¤ì •
+    ' ÃÖÁ¾ À§Ä¡ ¼³Á¤
     Set F_StartR = StartR.Offset(0, SRRC)
     Set F_EndR = EndR.Offset(0, ERRC)
 
-    ' ìµœì¢… OvalBridge í˜¸ì¶œF
+    ' ÃÖÁ¾ OvalBridge È£ÃâF
     Set Stamp_it = Me.OvalBridge(F_StartR, F_EndR, Direction:=Label_Side, _
                   MainText:=MainT, SLabelMod:=SingleLabelMod, SubTexts:=TitleCollecting(Text1, Text2, Text3))
 
@@ -297,7 +306,7 @@ Public Function Stamp_it_Auto(ByRef Criterion_Range As Range, _
     Dim FirstCol As Long, LastCol As Long, FirstRow As Long, LastRow As Long ' (First, Last)*(Col, Row)
     Dim Check As Range, StartR As Range, EndR As Range ' check, Start, End Range
 
-    For Each Check In Criterion_Range ' ì˜ì—­ ì§€ì •ìš© ë°˜ë³µë£¨í‹´
+    For Each Check In Criterion_Range ' ¿µ¿ª ÁöÁ¤¿ë ¹İº¹·çÆ¾
         If Not IsEmpty(Check.value) Then
             If FirstRow <= 0 Then FirstRow = Check.Row
             If LastRow < Check.Row Then LastRow = Check.Row: LastCol = Check.Column
@@ -312,10 +321,10 @@ Public Function Stamp_it_Auto(ByRef Criterion_Range As Range, _
         End If
     Next Check
    
-    If FirstCol < 0 Or FirstRow < 0 Or LastCol < 0 Or LastRow < 0 Then Debug.Print "ì˜ëª»ëœ ì˜ì—­ ì°¸ì¡°": Exit Function ' ì˜¤ë¥˜ë°œìƒì‹œ ì¢…ë£Œ
+    If FirstCol < 0 Or FirstRow < 0 Or LastCol < 0 Or LastRow < 0 Then Debug.Print "Àß¸øµÈ ¿µ¿ª ÂüÁ¶": Exit Function ' ¿À·ù¹ß»ı½Ã Á¾·á
     Set StartR = DrawingWS.Cells(FirstRow, FirstCol): Set EndR = DrawingWS.Cells(LastRow, LastCol)
     Set Stamp_it_Auto = Stamp_it(StartR, EndR, Stpt_Direction, Stpt_SingleLabel, Application.WorksheetFunction.Sum(Criterion_Range), Text1, Text2, Text3)
-    If Not CollectionForUndo Is Nothing Then CollectionForUndo.Add Stamp_it_Auto ' ì»¬ë ‰ì…˜ì— ì ì¬
+    If Not CollectionForUndo Is Nothing Then CollectionForUndo.Add Stamp_it_Auto ' ÄÃ·º¼Ç¿¡ ÀûÀç
 End Function
 Public Function MultiOvalBridge() As Shape
 
@@ -354,17 +363,17 @@ Private Sub SpotChecker(Xaxis As Single, Yaxis As Single, _
     Next i
     DrawingWS.Shapes.Range(ShpName).Group
 End Sub
-' Testìš© í”„ë¡œì‹œì €
+' Test¿ë ÇÁ·Î½ÃÀú
 Public Sub TestMethod()
     Dim Pivot As New ObjPivotAxis
     Dim Some As Range
     Set Some = DrawingWS.Cells(5, 5)
     With Some
         Pivot.X = .Left
-        Pivot.y = .Top
+        Pivot.Y = .Top
     End With
     
-    SpotChecker Pivot.X, Pivot.y
+    SpotChecker Pivot.X, Pivot.Y
 End Sub
 Public Sub DeleteShapes()
     For i = DrawingWS.Shapes.Count To 1 Step -1

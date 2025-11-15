@@ -1,3 +1,1 @@
-````
-
-### AutoReportHandler.frm
+Attribute VB_Name = "LinkToDB"

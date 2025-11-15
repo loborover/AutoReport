@@ -1,5 +1,6 @@
-### BA_BOM_Viewer.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BA_BOM_Viewer.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 '한번 만든 Title의 값을 이 모듈안에서 다른 서브루틴, 함수에서 참조하기 위해 모듈부에서 선언
 Private Title As String
@@ -256,10 +257,13 @@ Private Function GetModelName(BOMdirectory As String) As String
     xlApp.Quit
     Set xlApp = Nothing
 End Function
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BA_BOM_Viewer.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### Fillter.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Fillter.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Sub AutoFilltering_BOM(ws As Worksheet, FillteringCol As Collection)
     
     Dim FirstCol As Long
@@ -295,10 +299,13 @@ Private Function BOM_Array(col As Collection) As Variant
         
     BOM_Array = arr
 End Function
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Fillter.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### Printer.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Printer.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Public Type PrintSetting
     PrintArea As String ' 주소
     Orientation As XlPageOrientation ' 인쇄방향
@@ -559,10 +566,13 @@ Sub AutoPageSetup(ByRef ws As Worksheet, PrtStpVar As PrintSetting, _
     Print_setup = True
     
 End Sub
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Printer.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### BB_DailyPlan_Viewer.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BB_DailyPlan_Viewer.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
 Public MRB_DP As Boolean ' Manual_Reporting_Bool_DailyPlan
@@ -1024,10 +1034,13 @@ Private Function SetRangeForDraw(ByRef Criterion_Target As Range) As Range
     Set SetRangeForDraw = ws.Range(ws.Cells(FirstRow, LastCol), ws.Cells(LastRow, LastCol + 3))
     'Debug.Print "SetRangeForDraw : " & SetRangeForDraw.Address
 End Function
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BB_DailyPlan_Viewer.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### InventoryCart.cls
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+InventoryCart.cls Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
 Private Makers As New Collection, parts As New Collection, Duplicated As New Collection
@@ -1041,10 +1054,13 @@ End Sub
 Private Sub Class_Terminate()
     
 End Sub
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+InventoryCart.cls End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### AA_Test.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+AA_Test.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private ws As Worksheet
 
 Public Sub Painter_Test()
@@ -1116,14 +1132,20 @@ Debug.Print Z_Directory.BOM
 'Debug.Print GetWebText("https://naver.com")
 'Debug.Print GetWebText("https://github.com/loborover/AutoReport/tree/main")
 End Sub
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+AA_Test.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### LinkToDB.bas
-````vba
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+LinkToDB.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+LinkToDB.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### AutoReportHandler.frm
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+AutoReportHandler.frm Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Type ChkBx
     Manual_Reporting(1 To 2) As Boolean
     Print_Now(1 To 3) As Boolean
@@ -1661,10 +1683,13 @@ End Property
 Private Sub MultiPage_FeederChecker_Change()
     If MultiPage_FeederChecker.value = 0 Then D_ListView_Feeder_Updater
 End Sub
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+AutoReportHandler.frm End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### StickerLabel.cls
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+StickerLabel.cls Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '스티커라벨의 그림 드로잉 기능을 위한 클래스
 Private DrawingWS As Worksheet
 '초기화 이벤트 메서드
@@ -2360,10 +2385,13 @@ Private Sub SpotChecker(Xaxis As Single, Yaxis As Single, _
     Next i
     DrawingWS.Shapes.Range(ShpName).Group
 End Sub
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+StickerLabel.cls End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### Painter.cls
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Painter.cls Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '워크시트에 그림 정보를 사용해야 할 때, 최종출력용 그림 기능을 모아둔 클래스
 
 Private DrawingWS As Worksheet
@@ -2742,10 +2770,13 @@ Public Sub ShapesSelect()
         DrawingWS.Shapes(i).Select
     Next i
 End Sub
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Painter.cls End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### ObjPivotAxis.cls
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ObjPivotAxis.cls Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private vXaxis As Single, vYaxis As Single, vZaxis As Single
 Public Property Let X(value As Single): vXaxis = value: End Property
 Public Property Get X() As Single: X = vXaxis: End Property
@@ -2762,10 +2793,13 @@ Public Function Copy() As ObjPivotAxis
     End With
     Set Copy = CopiedObj
 End Function
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ObjPivotAxis.cls End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### ProductModel2.cls
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ProductModel2.cls Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
 Private vPrevious As ModelInfo
@@ -2886,10 +2920,13 @@ End Sub
 Public Sub test()
     Me.Compare2Models Me.Crr, Me.Nxt, mif_Spec
 End Sub
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ProductModel2.cls End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### ModelInfo.cls
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ModelInfo.cls Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
 Public Enum ModelinfoFeild
@@ -3004,10 +3041,13 @@ Public Function Copy() As ModelInfo ' Copy Function
     End With
     Set Copy = cLS
 End Function
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ModelInfo.cls End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### AA_Updater.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+AA_Updater.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 #Const isDev = True
 Private Const ThisModuleName As String = "AA_Updater"
 
@@ -3288,14 +3328,20 @@ Private Function GetVBNameFromFile(ByVal filePath As String) As String
     Close #ff
     GetVBNameFromFile = vbName
 End Function
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+AA_Updater.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### Cleaner_Handler.frm
-````vba
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Cleaner_Handler.frm Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Cleaner_Handler.frm End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### D_Maps.cls
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+D_Maps.cls Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
 Private Main_Groups As New Collection
@@ -3379,10 +3425,13 @@ Public Function Recent_Lot(Optional Index As Long = 0, Optional Target As MorS =
     End Select
 End Function
 
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+D_Maps.cls End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### D_LOT.cls
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+D_LOT.cls Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
 Private vLot_info As New Collection
@@ -3472,10 +3521,13 @@ ErrorHandler:
     Debug.Print "Err.Modelinfo"
     Exit Sub
 End Sub
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+D_LOT.cls End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### Cleaner.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Cleaner.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Sub FolderKiller(ByVal folderDirectory As String)
     Dim fso As Object
     Set fso = CreateObject("Scripting.FileSystemObject")
@@ -3486,10 +3538,13 @@ Sub FolderKiller(ByVal folderDirectory As String)
         Exit Sub
     End If
 End Sub
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Cleaner.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### BC_PartListItem_Viewer.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BC_PartListItem_Viewer.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
 Private Enum CollectorTypes
@@ -4018,18 +4073,24 @@ Private Sub MarkingUP_PL(ByRef Target As D_Maps)
         Next i
     End With
 End Sub
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BC_PartListItem_Viewer.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### BCB_PLIV_Focus.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BCB_PLIV_Focus.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
 
 
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BCB_PLIV_Focus.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### BCCUF.frm
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BCCUF.frm Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Const Color_Inversion_Criterion As Long = 204
 Private pvRGB(1 To 2) As New ObjPivotAxis
 Private Sub Userform_Initialize()
@@ -4211,10 +4272,13 @@ Private Sub Update_Colors()
     End With
     Set pvRGB(2) = pvRGB(1).Copy
 End Sub
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BCCUF.frm End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### BCA_PLIV_Feeder.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BCA_PLIV_Feeder.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 #Const COM = True
 Private ws As Worksheet
@@ -4372,10 +4436,13 @@ Private Function FOTFC(ByVal Target As String, ByRef From As MSForms.ComboBox) A
         If StrComp(From.List(i), Target, vbTextCompare) = 0 Then FOTFC = True: Exit Function
     Next i
 End Function
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BCA_PLIV_Feeder.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### FeederUnit.cls
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+FeederUnit.cls Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
 Private pName As String
@@ -4408,10 +4475,13 @@ Public Function Copy() As FeederUnit
     End With
     Set Copy = CopiedObj
 End Function
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+FeederUnit.cls End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### BD_MultiDocuments.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BD_MultiDocuments.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
 Private isParsed As Boolean
@@ -4453,10 +4523,13 @@ End Sub
 Public Sub MixMatching(ByVal Target_item As String)
     
 End Sub
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+BD_MultiDocuments.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### TimeKeeper.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+TimeKeeper.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
 ' 메인: (1) 날짜열+시간열 병합 또는 (2) 단일열(혼합포맷) → Target 열(Date) 저장, 표시형식은 "hh:mm"
@@ -4829,10 +4902,13 @@ Public Function isDayDiff(ByRef T1 As Range, ByRef T2 As Range, Optional ByVal M
     If Abs(DateValue(CDate(T2.value)) - DateValue(CDate(T1.value))) >= MinDays Then isDayDiff = True
 End Function
 
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+TimeKeeper.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### Utillity.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Utillity.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
 #If Win64 Then
@@ -5511,16 +5587,22 @@ End Sub
 Private Function FileExists(ByVal f As String) As Boolean
     FileExists = (Len(Dir$(f, vbNormal)) > 0)
 End Function
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Utillity.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### AB_ContorlApps.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+AB_ContorlApps.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+AB_ContorlApps.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### Z_Directory.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Z_Directory.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Const DvBOM As String = "BOM"
 Private Const DvDP As String = "DailyPlan"
 Private Const DvPL As String = "PartList"
@@ -5563,19 +5645,28 @@ End Property
 Public Property Get Source() As String
     Source = SourceFileFolder_Directory
 End Property
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Z_Directory.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### Git_Con.frm
-````vba
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Git_Con.frm Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Git_Con.frm End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### Git_Kit.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Git_Kit.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Git_Kit.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### itemUnit.cls
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+itemUnit.cls Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 '==========================================================
 ' Class: itemUnit (간소화 버전)
@@ -5745,10 +5836,13 @@ Public Function Copy() As itemUnit
     End With
     Set Copy = Copied
 End Function
-````
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+itemUnit.cls End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-### CA_itemCounter.bas
-````vba
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+CA_itemCounter.bas Start
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Option Explicit
 
 '==== 모듈 전역 변수 (기존 유지) ===============================================
@@ -6133,5 +6227,6 @@ Private Sub TempKiller(Optional ByRef Temp As Variant)
     Set Temp = Nothing
 End Sub
 
-````
-
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+CA_itemCounter.bas End
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

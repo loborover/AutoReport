@@ -1,14 +1,15 @@
+Attribute VB_Name = "TimeKeeper"
 Option Explicit
 
-' ë©”ì¸: (1) ë‚ ì§œì—´+ì‹œê°„ì—´ ë³‘í•© ë˜ëŠ” (2) ë‹¨ì¼ì—´(í˜¼í•©í¬ë§·) â†’ Target ì—´(Date) ì €ì¥, í‘œì‹œí˜•ì‹ì€ "hh:mm"
-' - ws         : ì‘ì—… ì‹œíŠ¸
-' - dateCol    : ë‚ ì§œ(ë˜ëŠ” í˜¼í•©) ì—´ ë²ˆí˜¸ (ì˜ˆ: D=4)
-' - targetCol  : íƒ€ê²Ÿ ì—´ ë²ˆí˜¸ (ì˜ˆ: F=6)
-' - timeCol    : ì‹œê°„ ì—´ ë²ˆí˜¸ (ê¸°ë³¸=0 â†’ ë‹¨ì¼ì—´ íŒŒì‹± ëª¨ë“œ)
+' ¸ŞÀÎ: (1) ³¯Â¥¿­+½Ã°£¿­ º´ÇÕ ¶Ç´Â (2) ´ÜÀÏ¿­(È¥ÇÕÆ÷¸Ë) ¡æ Target ¿­(Date) ÀúÀå, Ç¥½ÃÇü½ÄÀº "hh:mm"
+' - ws         : ÀÛ¾÷ ½ÃÆ®
+' - dateCol    : ³¯Â¥(¶Ç´Â È¥ÇÕ) ¿­ ¹øÈ£ (¿¹: D=4)
+' - targetCol  : Å¸°Ù ¿­ ¹øÈ£ (¿¹: F=6)
+' - timeCol    : ½Ã°£ ¿­ ¹øÈ£ (±âº»=0 ¡æ ´ÜÀÏ¿­ ÆÄ½Ì ¸ğµå)
 Public Sub MergeDateTime_Flexible(ByRef ws As Worksheet, _
                                   ByVal dateCol As Long, ByVal targetCol As Long, _
                                   Optional ByVal timeCol As Long = 0, _
-                                  Optional ByVal StartRow As Long = 2, _
+                                  Optional ByVal startRow As Long = 2, _
                                   Optional ByVal TargetHeader As String = "Input Time", _
                                   Optional ByVal Formatting As String = "hh:mm")
 
@@ -21,11 +22,11 @@ Public Sub MergeDateTime_Flexible(ByRef ws As Worksheet, _
     Application.ScreenUpdating = False
     Application.EnableEvents = False
 
-    ' ê¸°ì¤€ ì—´(ë‚ ì§œ í˜¹ì€ í˜¼í•©) ë§ˆì§€ë§‰ í–‰
+    ' ±âÁØ ¿­(³¯Â¥ È¤Àº È¥ÇÕ) ¸¶Áö¸· Çà
     LastRow = ws.Cells(ws.Rows.Count, dateCol).End(xlUp).Row
-    If LastRow < StartRow Then GoTo CleanExit ' ë°ì´í„° ì—†ìŒ
+    If LastRow < startRow Then GoTo CleanExit ' µ¥ÀÌÅÍ ¾øÀ½
 
-    For r = StartRow To LastRow
+    For r = startRow To LastRow
         vD = ws.Cells(r, dateCol).value2
         If timeCol > 0 Then
             vT = ws.Cells(r, timeCol).value2
@@ -34,24 +35,24 @@ Public Sub MergeDateTime_Flexible(ByRef ws As Worksheet, _
         End If
 
         If TryParseDateTimeFlex(vD, vT, dt) Then
-            ws.Cells(r, targetCol).value = dt ' ê°’ì€ Date ì§ë ¬ê°’
+            ws.Cells(r, targetCol).value = dt ' °ªÀº Date Á÷·Ä°ª
         Else
             ws.Cells(r, targetCol).ClearContents
         End If
     Next r
 
-    ' í‘œì‹œ í˜•ì‹(ê°’ì€ Date ê·¸ëŒ€ë¡œ ìœ ì§€)
-    ws.Range(ws.Cells(StartRow, targetCol), ws.Cells(LastRow, targetCol)).NumberFormat = Formatting
-    ws.Cells(StartRow - 1, targetCol).value = TargetHeader
+    ' Ç¥½Ã Çü½Ä(°ªÀº Date ±×´ë·Î À¯Áö)
+    ws.Range(ws.Cells(startRow, targetCol), ws.Cells(LastRow, targetCol)).NumberFormat = Formatting
+    ws.Cells(startRow - 1, targetCol).value = TargetHeader
 
 CleanExit:
     Application.EnableEvents = True
     Application.ScreenUpdating = True
 End Sub
 
-' vDate, vTimeì„ ë‹¤ì–‘í•œ í¬ë§·ìœ¼ë¡œ ë°›ì•„ Dateìœ¼ë¡œ ë³€í™˜
-' - vTimeì´ ì œê³µë˜ë©´: YYYYMMDD/ë‚ ì§œê°’ + ì‹œê°„ê°’/í…ìŠ¤íŠ¸ ë“±ì„ ë³‘í•©
-' - vTimeì´ ì—†ìœ¼ë©´: vDate(í˜¼í•©ì—´)ì—ì„œ ë‚ ì§œ+ì‹œê°„ì„ ëª¨ë‘ íŒŒì‹±
+' vDate, vTimeÀ» ´Ù¾çÇÑ Æ÷¸ËÀ¸·Î ¹Ş¾Æ DateÀ¸·Î º¯È¯
+' - vTimeÀÌ Á¦°øµÇ¸é: YYYYMMDD/³¯Â¥°ª + ½Ã°£°ª/ÅØ½ºÆ® µîÀ» º´ÇÕ
+' - vTimeÀÌ ¾øÀ¸¸é: vDate(È¥ÇÕ¿­)¿¡¼­ ³¯Â¥+½Ã°£À» ¸ğµÎ ÆÄ½Ì
 Private Function TryParseDateTimeFlex(ByVal vDate As Variant, ByVal vTime As Variant, ByRef outDT As Date) As Boolean
     Dim baseDate As Date
     Dim tfrac As Double
@@ -59,48 +60,48 @@ Private Function TryParseDateTimeFlex(ByVal vDate As Variant, ByVal vTime As Var
     TryParseDateTimeFlex = False
     outDT = 0
 
-    ' ë‘ ì—´ ë³‘í•© ëª¨ë“œ: vTimeì´ ì˜ë¯¸ìˆê²Œ ë“¤ì–´ì˜¨ ê²½ìš°
+    ' µÎ ¿­ º´ÇÕ ¸ğµå: vTimeÀÌ ÀÇ¹ÌÀÖ°Ô µé¾î¿Â °æ¿ì
     If Not IsEmpty(vTime) And Not IsError(vTime) Then
-        ' ë‚ ì§œ í•´ì„
+        ' ³¯Â¥ ÇØ¼®
         If Not TryParse_DateOnly(vDate, baseDate) Then Exit Function
-        ' ì‹œê°„ í•´ì„
+        ' ½Ã°£ ÇØ¼®
         If Not TryGetTimeFraction_Flex(vTime, tfrac) Then tfrac = 0#
         outDT = baseDate + tfrac
         TryParseDateTimeFlex = True
         Exit Function
     End If
 
-    ' ë‹¨ì¼ ì—´(í˜¼í•© í¬ë§·) ëª¨ë“œ: vDate ì•ˆì— ë‚ ì§œ+ì‹œê°„(ë˜ëŠ” ë‘˜ ì¤‘ í•˜ë‚˜)
+    ' ´ÜÀÏ ¿­(È¥ÇÕ Æ÷¸Ë) ¸ğµå: vDate ¾È¿¡ ³¯Â¥+½Ã°£(¶Ç´Â µÑ Áß ÇÏ³ª)
     If IsEmpty(vDate) Or IsError(vDate) Then Exit Function
 
-    ' 1) ì´ë¯¸ ë‚ ì§œ/ì‹œê°„ ê°’(ì§ë ¬)ì¸ ê²½ìš°
+    ' 1) ÀÌ¹Ì ³¯Â¥/½Ã°£ °ª(Á÷·Ä)ÀÎ °æ¿ì
     If IsDate(vDate) Then
         outDT = CDate(vDate)
         TryParseDateTimeFlex = True
         Exit Function
     End If
 
-    ' 2) í…ìŠ¤íŠ¸ì¸ ê²½ìš° ì²˜ë¦¬ (ì˜¤ì „/ì˜¤í›„, AM/PM, YYYYMMDD, hhmmss ë“±)
-    Dim s As String, sNorm As String, y As Long, m As Long, d As Long
+    ' 2) ÅØ½ºÆ®ÀÎ °æ¿ì Ã³¸® (¿ÀÀü/¿ÀÈÄ, AM/PM, YYYYMMDD, hhmmss µî)
+    Dim s As String, sNorm As String, Y As Long, m As Long, d As Long
     s = Trim$(CStr(vDate))
     If Len(s) = 0 Then Exit Function
 
-    ' a) "YYYYMMDD" ë‹¨ë…
+    ' a) "YYYYMMDD" ´Üµ¶
     If Len(s) = 8 And isNumeric(s) Then
         If TryParseYmd8_ToDate(s, baseDate) Then
-            outDT = baseDate ' ì‹œê°„ 00:00
+            outDT = baseDate ' ½Ã°£ 00:00
             TryParseDateTimeFlex = True
             Exit Function
         End If
     End If
 
-    ' b) "YYYYMMDD HH:MM[:SS]" ë˜ëŠ” "YYYYMMDD ì˜¤ì „ HH:MM[:SS]" ë“±
+    ' b) "YYYYMMDD HH:MM[:SS]" ¶Ç´Â "YYYYMMDD ¿ÀÀü HH:MM[:SS]" µî
     If TryParse_Ymd8_And_TimeText(s, outDT) Then
         TryParseDateTimeFlex = True
         Exit Function
     End If
 
-    ' c) ì¼ë°˜ í…ìŠ¤íŠ¸ ë‚ ì§œ/ì‹œê°„ (ì˜¤ì „/ì˜¤í›„ â†’ AM/PM ì¹˜í™˜ í›„ CDate ì‹œë„)
+    ' c) ÀÏ¹İ ÅØ½ºÆ® ³¯Â¥/½Ã°£ (¿ÀÀü/¿ÀÈÄ ¡æ AM/PM Ä¡È¯ ÈÄ CDate ½Ãµµ)
     sNorm = NormalizeKoreanAmPm(s)
     On Error Resume Next
     outDT = CDate(sNorm)
@@ -110,9 +111,9 @@ Private Function TryParseDateTimeFlex(ByVal vDate As Variant, ByVal vTime As Var
     On Error GoTo 0
 End Function
 
-' YYYYMMDD(ìˆ«ì/í…ìŠ¤íŠ¸) â†’ Date (ì‹œê°„ 00:00)
+' YYYYMMDD(¼ıÀÚ/ÅØ½ºÆ®) ¡æ Date (½Ã°£ 00:00)
 Private Function TryParseYmd8_ToDate(ByVal v As Variant, ByRef outDate As Date) As Boolean
-    Dim n As Long, y As Long, m As Long, d As Long
+    Dim n As Long, Y As Long, m As Long, d As Long
     Dim s As String
 
     TryParseYmd8_ToDate = False
@@ -121,28 +122,28 @@ Private Function TryParseYmd8_ToDate(ByVal v As Variant, ByRef outDate As Date) 
     If isNumeric(v) Then
         n = CLng(v)
         If n <= 0 Then Exit Function
-        y = n \ 10000
+        Y = n \ 10000
         m = (n \ 100) Mod 100
         d = n Mod 100
     Else
         s = Trim$(CStr(v))
         If Len(s) <> 8 Then Exit Function
         If Not isNumeric(s) Then Exit Function
-        y = CLng(Left$(s, 4))
-        m = CLng(Mid$(s, 5, 2))
+        Y = CLng(Left$(s, 4))
+        m = CLng(mid$(s, 5, 2))
         d = CLng(Right$(s, 2))
     End If
 
-    If y < 1900 Or m < 1 Or m > 12 Or d < 1 Or d > 31 Then Exit Function
+    If Y < 1900 Or m < 1 Or m > 12 Or d < 1 Or d > 31 Then Exit Function
 
-    outDate = DateSerial(y, m, d)
+    outDate = DateSerial(Y, m, d)
     TryParseYmd8_ToDate = True
 End Function
 
-' í˜¼í•© í…ìŠ¤íŠ¸ì—ì„œ "YYYYMMDD [ì˜¤ì „/ì˜¤í›„|AM/PM] hh:mm[:ss]" íŒ¨í„´ ì²˜ë¦¬
-' ì˜ˆ: "20250831 ì˜¤ì „ 08:00:00", "20250831 8:00", "20250831 PM 8:00"
+' È¥ÇÕ ÅØ½ºÆ®¿¡¼­ "YYYYMMDD [¿ÀÀü/¿ÀÈÄ|AM/PM] hh:mm[:ss]" ÆĞÅÏ Ã³¸®
+' ¿¹: "20250831 ¿ÀÀü 08:00:00", "20250831 8:00", "20250831 PM 8:00"
 Private Function TryParse_Ymd8_And_TimeText(ByVal s As String, ByRef outDT As Date) As Boolean
-    Dim sTrim As String, y As Long, m As Long, d As Long
+    Dim sTrim As String, Y As Long, m As Long, d As Long
     Dim datePart As String, timePart As String, posSp As Long
     Dim baseDate As Date, tfrac As Double
 
@@ -150,13 +151,13 @@ Private Function TryParse_Ymd8_And_TimeText(ByVal s As String, ByRef outDT As Da
     sTrim = Trim$(s)
     If Len(sTrim) < 8 Then Exit Function
 
-    ' ì• 8ìë¦¬ê°€ YYYYMMDDì¸ê°€?
+    ' ¾Õ 8ÀÚ¸®°¡ YYYYMMDDÀÎ°¡?
     If Not isNumeric(Left$(sTrim, 8)) Then Exit Function
     datePart = Left$(sTrim, 8)
     If Not TryParseYmd8_ToDate(datePart, baseDate) Then Exit Function
 
-    ' ë’¤ìª½ì—ì„œ ì‹œê°„ë¶€ë¶„ ì¶”ì¶œ(ìˆì„ ìˆ˜ë„, ì—†ì„ ìˆ˜ë„)
-    timePart = Mid$(sTrim, 9) ' 9ë²ˆì§¸ ì´í›„
+    ' µÚÂÊ¿¡¼­ ½Ã°£ºÎºĞ ÃßÃâ(ÀÖÀ» ¼öµµ, ¾øÀ» ¼öµµ)
+    timePart = mid$(sTrim, 9) ' 9¹øÂ° ÀÌÈÄ
     timePart = Trim$(timePart)
 
     If Len(timePart) = 0 Then
@@ -165,18 +166,18 @@ Private Function TryParse_Ymd8_And_TimeText(ByVal s As String, ByRef outDT As Da
         Exit Function
     End If
 
-    ' ì‹œê°„ í…ìŠ¤íŠ¸ë¥¼ ë¶„ìˆ˜ì¼ë¡œ ë³€í™˜
+    ' ½Ã°£ ÅØ½ºÆ®¸¦ ºĞ¼öÀÏ·Î º¯È¯
     If TryGetTimeFraction_Flex(timePart, tfrac) Then
         outDT = baseDate + tfrac
         TryParse_Ymd8_And_TimeText = True
     End If
 End Function
 
-' ì‹œê°„ê°’ì˜ "ì†Œìˆ˜ì¼ìˆ˜" ì¶”ì¶œ (0.0 ~ <1.0)
-' í—ˆìš©:
-'  - ì‹¤ì œ ë‚ ì§œ/ì‹œê°„ ê°’ (ì§ë ¬)
-'  - "08:00:00"/"8:00"/"8:00 PM"/"ì˜¤ì „ 8:00" ë“±ì˜ í…ìŠ¤íŠ¸
-'  - "080000" ë“± 6ìë¦¬ ì‹œê°„ í…ìŠ¤íŠ¸
+' ½Ã°£°ªÀÇ "¼Ò¼öÀÏ¼ö" ÃßÃâ (0.0 ~ <1.0)
+' Çã¿ë:
+'  - ½ÇÁ¦ ³¯Â¥/½Ã°£ °ª (Á÷·Ä)
+'  - "08:00:00"/"8:00"/"8:00 PM"/"¿ÀÀü 8:00" µîÀÇ ÅØ½ºÆ®
+'  - "080000" µî 6ÀÚ¸® ½Ã°£ ÅØ½ºÆ®
 Private Function TryGetTimeFraction_Flex(ByVal v As Variant, ByRef outFrac As Double) As Boolean
     Dim s As String, hh As Long, nn As Long, ss As Long
     Dim sNorm As String
@@ -186,22 +187,22 @@ Private Function TryGetTimeFraction_Flex(ByVal v As Variant, ByRef outFrac As Do
 
     If IsEmpty(v) Or IsError(v) Then Exit Function
 
-    ' ì´ë¯¸ ë‚ ì§œ/ì‹œê°„ ê°’(ì§ë ¬)ì¸ ê²½ìš°
+    ' ÀÌ¹Ì ³¯Â¥/½Ã°£ °ª(Á÷·Ä)ÀÎ °æ¿ì
     If IsDate(v) Then
-        outFrac = CDbl(CDate(v)) - Fix(CDbl(CDate(v))) ' ì •ìˆ˜ë¶€ ì œê±°: ì‹œê°„ ë¶€ë¶„ë§Œ
+        outFrac = CDbl(CDate(v)) - Fix(CDbl(CDate(v))) ' Á¤¼öºÎ Á¦°Å: ½Ã°£ ºÎºĞ¸¸
         TryGetTimeFraction_Flex = True
         Exit Function
     End If
 
-    ' í…ìŠ¤íŠ¸ ì²˜ë¦¬
+    ' ÅØ½ºÆ® Ã³¸®
     s = Trim$(CStr(v))
     If Len(s) = 0 Then Exit Function
 
-    ' "ì˜¤ì „/ì˜¤í›„" â†’ AM/PM ì •ê·œí™”
+    ' "¿ÀÀü/¿ÀÈÄ" ¡æ AM/PM Á¤±ÔÈ­
     sNorm = NormalizeKoreanAmPm(s)
 
     If InStr(sNorm, ":") > 0 Then
-        ' "hh:mm[:ss]" (AM/PM í¬í•¨ ê°€ëŠ¥)
+        ' "hh:mm[:ss]" (AM/PM Æ÷ÇÔ °¡´É)
         On Error Resume Next
         outFrac = TimeValue(sNorm)
         If Err.Number = 0 Then TryGetTimeFraction_Flex = True
@@ -209,7 +210,7 @@ Private Function TryGetTimeFraction_Flex(ByVal v As Variant, ByRef outFrac As Do
     ElseIf Len(sNorm) = 6 And isNumeric(sNorm) Then
         ' "hhmmss"
         hh = CLng(Left$(sNorm, 2))
-        nn = CLng(Mid$(sNorm, 3, 2))
+        nn = CLng(mid$(sNorm, 3, 2))
         ss = CLng(Right$(sNorm, 2))
         If hh >= 0 And hh <= 23 And nn >= 0 And nn <= 59 And ss >= 0 And ss <= 59 Then
             outFrac = TimeSerial(hh, nn, ss)
@@ -218,22 +219,22 @@ Private Function TryGetTimeFraction_Flex(ByVal v As Variant, ByRef outFrac As Do
     End If
 End Function
 
-' í•œêµ­ì–´ ì˜¤ì „/ì˜¤í›„ë¥¼ AM/PMìœ¼ë¡œ ì¹˜í™˜í•˜ê³ , ë¶ˆí•„ìš”í•œ ì¤‘ë³µ ê³µë°± ì •ë¦¬
+' ÇÑ±¹¾î ¿ÀÀü/¿ÀÈÄ¸¦ AM/PMÀ¸·Î Ä¡È¯ÇÏ°í, ºÒÇÊ¿äÇÑ Áßº¹ °ø¹é Á¤¸®
 Private Function NormalizeKoreanAmPm(ByVal s As String) As String
     Dim t As String
     t = s
-    ' ë³€í˜• ì¼€ì´ìŠ¤ ìµœì†Œí™”: ì•ë’¤ ê³µë°±ì— ë‘”ê°í•˜ê²Œ
-    t = Replace(t, "ì˜¤ì „", "AM")
-    t = Replace(t, "ì˜¤ í›„", "PM") ' í˜¹ì‹œ ìˆì„ ëŠìŠ¨í•œ í‘œê¸°
-    t = Replace(t, "ì˜¤í›„", "PM")
-    ' ë‹¤ì¤‘ ê³µë°± ì¶•ì†Œ(ê°„ë‹¨ì¹˜í™˜)
+    ' º¯Çü ÄÉÀÌ½º ÃÖ¼ÒÈ­: ¾ÕµÚ °ø¹é¿¡ µĞ°¨ÇÏ°Ô
+    t = Replace(t, "¿ÀÀü", "AM")
+    t = Replace(t, "¿À ÈÄ", "PM") ' È¤½Ã ÀÖÀ» ´À½¼ÇÑ Ç¥±â
+    t = Replace(t, "¿ÀÈÄ", "PM")
+    ' ´ÙÁß °ø¹é Ãà¼Ò(°£´ÜÄ¡È¯)
     Do While InStr(t, "  ") > 0
         t = Replace(t, "  ", " ")
     Loop
     NormalizeKoreanAmPm = Trim$(t)
 End Function
 
-' (ì„ íƒ) DateOnly ì „ìš© íŒŒì„œ: ìˆ«ìí˜• ì§ë ¬/í…ìŠ¤íŠ¸ YYYYMMDD/í‘œì¤€ ë‚ ì§œí…ìŠ¤íŠ¸ë¥¼ ì•„ìš°ë¦„
+' (¼±ÅÃ) DateOnly Àü¿ë ÆÄ¼­: ¼ıÀÚÇü Á÷·Ä/ÅØ½ºÆ® YYYYMMDD/Ç¥ÁØ ³¯Â¥ÅØ½ºÆ®¸¦ ¾Æ¿ì¸§
 Private Function TryParse_DateOnly(ByVal v As Variant, ByRef outDate As Date) As Boolean
     Dim s As String
     TryParse_DateOnly = False
@@ -255,7 +256,7 @@ Private Function TryParse_DateOnly(ByVal v As Variant, ByRef outDate As Date) As
         End If
     End If
 
-    ' ì¼ë°˜ í…ìŠ¤íŠ¸ ë‚ ì§œ(êµ¬ë¶„ì í¬í•¨)ë„ í—ˆìš©
+    ' ÀÏ¹İ ÅØ½ºÆ® ³¯Â¥(±¸ºĞÀÚ Æ÷ÇÔ)µµ Çã¿ë
     On Error Resume Next
     outDate = DateValue(CDate(s))
     If Err.Number = 0 Then TryParse_DateOnly = True
@@ -263,12 +264,12 @@ Private Function TryParse_DateOnly(ByVal v As Variant, ByRef outDate As Date) As
 End Function
 
 '========================
-' ê³µê°œ API
+' °ø°³ API
 '========================
-' StartDT ~ EndDT ì‚¬ì´ì—ì„œ
-' - ì¤‘ê°„ ë‚ ì§œ(ì‹œì‘ì¼+1 ~ ì¢…ë£Œì¼-1)ëŠ” ë¬´ì‹œ
-' - ì‹œì‘ì¼ì˜ StartDT~ìì •, ì¢…ë£Œì¼ì˜ ìì •~EndDTë§Œ ê³„ì‚°
-' - ê° ë‚ ì§œ êµ¬ê°„ì—ì„œ ì œì™¸ì‹œê°„ê³¼ ê²¹ì¹˜ëŠ” ë¶€ë¶„ë§Œ ì°¨ê°
+' StartDT ~ EndDT »çÀÌ¿¡¼­
+' - Áß°£ ³¯Â¥(½ÃÀÛÀÏ+1 ~ Á¾·áÀÏ-1)´Â ¹«½Ã
+' - ½ÃÀÛÀÏÀÇ StartDT~ÀÚÁ¤, Á¾·áÀÏÀÇ ÀÚÁ¤~EndDT¸¸ °è»ê
+' - °¢ ³¯Â¥ ±¸°£¿¡¼­ Á¦¿Ü½Ã°£°ú °ãÄ¡´Â ºÎºĞ¸¸ Â÷°¨
 Public Function Time_Filtering(ByVal StartDT As Date, ByVal EndDT As Date) As Date
     Dim TC As New Collection
     Dim Total As Double
@@ -280,7 +281,7 @@ Public Function Time_Filtering(ByVal StartDT As Date, ByVal EndDT As Date) As Da
         Exit Function
     End If
 
-    ' (ì˜ˆì‹œ) ì œì™¸ì‹œê°„ ì •ì˜: "hh:mm:ss-hh:mm:ss"
+    ' (¿¹½Ã) Á¦¿Ü½Ã°£ Á¤ÀÇ: "hh:mm:ss-hh:mm:ss"
     TC.Add "00:00:00-08:00:00"
     TC.Add "10:00:00-10:10:00"
     TC.Add "12:00:00-13:00:00"
@@ -293,28 +294,28 @@ Public Function Time_Filtering(ByVal StartDT As Date, ByVal EndDT As Date) As Da
     endDay = DateSerial(Year(EndDT), Month(EndDT), Day(EndDT))
 
     If startDay = endDay Then
-        ' ê°™ì€ ë‚ ì§œ ì•ˆì—ì„œ ëë‚˜ëŠ” ê²½ìš°: ë‹¨ì¼ êµ¬ê°„ ê³„ì‚°
+        ' °°Àº ³¯Â¥ ¾È¿¡¼­ ³¡³ª´Â °æ¿ì: ´ÜÀÏ ±¸°£ °è»ê
         Total = NetDurationSingleDay(StartDT, EndDT, TC)
     Else
-        ' ì„œë¡œ ë‹¤ë¥¸ ë‚ ì§œ: ì‹œì‘ì¼ êµ¬ê°„ + ì¢…ë£Œì¼ êµ¬ê°„ë§Œ ê³„ì‚°
-        startDayEnd = DateAdd("d", 1, startDay) ' ë‹¤ìŒ ë‚  00:00
-        endDayStart = endDay                     ' ì¢…ë£Œì¼ 00:00
+        ' ¼­·Î ´Ù¸¥ ³¯Â¥: ½ÃÀÛÀÏ ±¸°£ + Á¾·áÀÏ ±¸°£¸¸ °è»ê
+        startDayEnd = DateAdd("d", 1, startDay) ' ´ÙÀ½ ³¯ 00:00
+        endDayStart = endDay                     ' Á¾·áÀÏ 00:00
 
-        ' ì‹œì‘ì¼: StartDT ~ ìì •
+        ' ½ÃÀÛÀÏ: StartDT ~ ÀÚÁ¤
         Total = Total + NetDurationSingleDay(StartDT, startDayEnd, TC)
-        ' ì¢…ë£Œì¼: ìì • ~ EndDT
+        ' Á¾·áÀÏ: ÀÚÁ¤ ~ EndDT
         Total = Total + NetDurationSingleDay(endDayStart, EndDT, TC)
-        ' ì¤‘ê°„ ë‚ ì§œ(startDay+1 ~ endDay-1)ëŠ” ì „ë¶€ ì œì™¸ (ì˜ë„ì ìœ¼ë¡œ ì•„ë¬´ ê²ƒë„ ë”í•˜ì§€ ì•ŠìŒ)
+        ' Áß°£ ³¯Â¥(startDay+1 ~ endDay-1)´Â ÀüºÎ Á¦¿Ü (ÀÇµµÀûÀ¸·Î ¾Æ¹« °Íµµ ´õÇÏÁö ¾ÊÀ½)
     End If
 
-    Time_Filtering = Total ' Double(ì¼ìˆ˜) â†’ Date ì§ë ¬ ë°˜í™˜
+    Time_Filtering = Total ' Double(ÀÏ¼ö) ¡æ Date Á÷·Ä ¹İÈ¯
 End Function
 
 '========================
-' í—¬í¼: ë‹¨ì¼ ë‚ ì§œ êµ¬ê°„ë§Œ ë‹¤ë£¸
+' ÇïÆÛ: ´ÜÀÏ ³¯Â¥ ±¸°£¸¸ ´Ù·ë
 '========================
-' [segStart, segEnd) ê°€ ë°˜ë“œì‹œ ê°™ì€ ë‚ ì§œ(ìì • ë¯¸ë§Œ) ë²”ìœ„ë¼ê³  ê°€ì •í•˜ê³ ,
-' ì œì™¸ì‹œê°„ ì»¬ë ‰ì…˜(TC)ê³¼ì˜ ê²¹ì¹¨ë§Œí¼ Durationì—ì„œ ì°¨ê°
+' [segStart, segEnd) °¡ ¹İµå½Ã °°Àº ³¯Â¥(ÀÚÁ¤ ¹Ì¸¸) ¹üÀ§¶ó°í °¡Á¤ÇÏ°í,
+' Á¦¿Ü½Ã°£ ÄÃ·º¼Ç(TC)°úÀÇ °ãÄ§¸¸Å­ Duration¿¡¼­ Â÷°¨
 Private Function NetDurationSingleDay(ByVal segStart As Date, ByVal segEnd As Date, ByVal TC As Collection) As Double
     Dim dur As Double
     Dim s As Variant, parts() As String
@@ -327,17 +328,17 @@ Private Function NetDurationSingleDay(ByVal segStart As Date, ByVal segEnd As Da
         Exit Function
     End If
 
-    dur = segEnd - segStart ' ê¸°ë³¸ ê¸¸ì´(ì¼ìˆ˜)
+    dur = segEnd - segStart ' ±âº» ±æÀÌ(ÀÏ¼ö)
 
     For Each s In TC
         parts = Split(CStr(s), "-")
         If UBound(parts) = 1 Then
-            ' ì‹œê°„ í…ìŠ¤íŠ¸ë¥¼ Timeìœ¼ë¡œ
+            ' ½Ã°£ ÅØ½ºÆ®¸¦ TimeÀ¸·Î
             exStartT = TimeValue(parts(0))
             exEndT = TimeValue(parts(1))
 
-            ' ê°™ì€ "ë‚ ì§œ" ê¸°ì¤€ìœ¼ë¡œ ì œì™¸êµ¬ê°„ êµ¬ì„±
-            ' 1) ì •ìƒ ìˆœí–‰(exEndT > exStartT): segStartì˜ ë‚ ì§œì— ê·¸ëŒ€ë¡œ ë§¤í•‘
+            ' °°Àº "³¯Â¥" ±âÁØÀ¸·Î Á¦¿Ü±¸°£ ±¸¼º
+            ' 1) Á¤»ó ¼øÇà(exEndT > exStartT): segStartÀÇ ³¯Â¥¿¡ ±×´ë·Î ¸ÅÇÎ
             If exEndT > exStartT Then
                 exStart = DateSerial(Year(segStart), Month(segStart), Day(segStart)) + (exStartT - Fix(exStartT))
                 exEnd = DateSerial(Year(segStart), Month(segStart), Day(segStart)) + (exEndT - Fix(exEndT))
@@ -346,19 +347,19 @@ Private Function NetDurationSingleDay(ByVal segStart As Date, ByVal segEnd As Da
                 ovE = Application.WorksheetFunction.Min(segEnd, exEnd)
                 If ovE > ovS Then dur = dur - (ovE - ovS)
 
-            ' 2) ìì • ê±¸ì¹¨(exEndT <= exStartT): ë‘ ì¡°ê°ìœ¼ë¡œ ë¶„ë¦¬
-            '    a) ë‹¹ì¼ exStartT ~ 24:00 (ê°™ì€ ë‚ ì§œ ì¡°ê°)
-            '    b) ìµì¼ 00:00 ~ exEndT   (ë‹¤ìŒë‚  ì¡°ê°) â†’ ë‹¨ì¼ì¼ ì²˜ë¦¬ì—ì„œëŠ” ë¬´ì‹œ
+            ' 2) ÀÚÁ¤ °ÉÄ§(exEndT <= exStartT): µÎ Á¶°¢À¸·Î ºĞ¸®
+            '    a) ´çÀÏ exStartT ~ 24:00 (°°Àº ³¯Â¥ Á¶°¢)
+            '    b) ÀÍÀÏ 00:00 ~ exEndT   (´ÙÀ½³¯ Á¶°¢) ¡æ ´ÜÀÏÀÏ Ã³¸®¿¡¼­´Â ¹«½Ã
             Else
-                ' a) ê°™ì€ ë‚ ì§œì˜ í›„ë¯¸ ì¡°ê°ë§Œ ë°˜ì˜
+                ' a) °°Àº ³¯Â¥ÀÇ ÈÄ¹Ì Á¶°¢¸¸ ¹İ¿µ
                 exStart = DateSerial(Year(segStart), Month(segStart), Day(segStart)) + (exStartT - Fix(exStartT))
-                exEnd = DateAdd("d", 1, DateSerial(Year(segStart), Month(segStart), Day(segStart))) ' ìì •(ë‹¤ìŒë‚  00:00)
+                exEnd = DateAdd("d", 1, DateSerial(Year(segStart), Month(segStart), Day(segStart))) ' ÀÚÁ¤(´ÙÀ½³¯ 00:00)
 
                 ovS = Application.WorksheetFunction.Max(segStart, exStart)
                 ovE = Application.WorksheetFunction.Min(segEnd, exEnd)
                 If ovE > ovS Then dur = dur - (ovE - ovS)
 
-                ' b) ìµì¼ ì¡°ê°ì€ ì´ í•¨ìˆ˜ì˜ ì±…ì„ ë²”ìœ„ê°€ ì•„ë‹˜(í•´ë‹¹ ë‚ ì§œì—ì„œ ë‹¤ì‹œ ê³„ì‚°ë¨)
+                ' b) ÀÍÀÏ Á¶°¢Àº ÀÌ ÇÔ¼öÀÇ Ã¥ÀÓ ¹üÀ§°¡ ¾Æ´Ô(ÇØ´ç ³¯Â¥¿¡¼­ ´Ù½Ã °è»êµÊ)
             End If
         End If
     Next
@@ -369,3 +370,4 @@ Public Function isDayDiff(ByRef T1 As Range, ByRef T2 As Range, Optional ByVal M
     If Not IsDate(T1.value) Or Not IsDate(T2.value) Then isDayDiff = False: Exit Function
     If Abs(DateValue(CDate(T2.value)) - DateValue(CDate(T1.value))) >= MinDays Then isDayDiff = True
 End Function
+

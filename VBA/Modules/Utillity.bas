@@ -1,3 +1,4 @@
+Attribute VB_Name = "Utillity"
 Option Explicit
 
 #If Win64 Then
@@ -13,18 +14,18 @@ Option Explicit
 Public UI As AutoReportHandler
 
 '---------------------------
-' 1) íŒŒì‹± ê²°ê³¼ë¥¼ ë‹´ëŠ” UDT
+' 1) ÆÄ½Ì °á°ú¸¦ ´ã´Â UDT
 '---------------------------
 Public Type MDToken
     DocType As DocumentTypes   ' dc_DailyPlan / dc_PartList
     Month As Integer
     Day As Integer
-    LineAddr As String         ' ì˜ˆ: "C11"
-    fullPath As String         ' ì›ë³¸ ê²½ë¡œ
-    FileName As String         ' íŒŒì¼ëª…ë§Œ
-    DateValue As Date          ' BaseYear ì ìš©ëœ ì‹¤ì œ Date
-    WeekdayVb As VbDayOfWeek   ' vbMonday ë“±
-    WeekdayK As String         ' "ì›”","í™”","ìˆ˜" ...
+    LineAddr As String         ' ¿¹: "C11"
+    fullPath As String         ' ¿øº» °æ·Î
+    fileName As String         ' ÆÄÀÏ¸í¸¸
+    DateValue As Date          ' BaseYear Àû¿ëµÈ ½ÇÁ¦ Date
+    WeekdayVb As VbDayOfWeek   ' vbMonday µî
+    WeekdayK As String         ' "¿ù","È­","¼ö" ...
 End Type
 
 Public Enum DocumentTypes
@@ -77,28 +78,28 @@ Public Enum ObjDirection4Way
 End Enum
 
 Public Function SaveFilesWithCustomDirectory(directoryPath As String, _
-                ByRef wb As Workbook, _
+                ByRef Wb As Workbook, _
                 ByRef PDFpagesetup As PrintSetting, _
                 Optional ByRef vTitle As String = "UndefinedFile", _
                 Optional SaveToXlsx As Boolean = False, _
                 Optional SaveToPDF As Boolean = True, _
                 Optional OriginalKiller As Boolean = True) As String
     On Error Resume Next
-    Dim ws As Worksheet: Set ws = wb.Worksheets(1)
+    Dim ws As Worksheet: Set ws = Wb.Worksheets(1)
     Dim ExcelPath As String, savePath As String, ToDeleteDir As String
-    ExcelPath = ThisWorkbook.Path: ToDeleteDir = wb.FullName
-'ì£¼ì†Œê°€ ì—†ìœ¼ë©´ ìƒì„±
+    ExcelPath = ThisWorkbook.Path: ToDeleteDir = Wb.FullName
+'ÁÖ¼Ò°¡ ¾øÀ¸¸é »ı¼º
     If Dir(ExcelPath & "\" & directoryPath, vbDirectory) = "" Then MkDir ExcelPath & "\" & directoryPath
-'íŒŒì¼ ì €ì¥ìš© ì£¼ì†Œ ìƒì„±
+'ÆÄÀÏ ÀúÀå¿ë ÁÖ¼Ò »ı¼º
     savePath = ExcelPath & "\" & directoryPath & "\" & vTitle
-'ì´ë¯¸ ì €ì¥ëœ íŒŒì¼ì´ ìˆë‹¤ë©´ ì‚­ì œ
+'ÀÌ¹Ì ÀúÀåµÈ ÆÄÀÏÀÌ ÀÖ´Ù¸é »èÁ¦
     If Dir(savePath & ".xlsx") <> "" Then Kill savePath & ".xlsx"
     If Dir(savePath & ".pdf") <> "" Then Kill savePath & ".pdf"
-'PDF ì…‹ì—… í›„ PDFì¶œë ¥
+'PDF ¼Â¾÷ ÈÄ PDFÃâ·Â
     AutoPageSetup ws, PDFpagesetup
     If SaveToPDF Then ws.PrintOut ActivePrinter:="Microsoft Print to PDF", PrintToFile:=True, prtofilename:=savePath & ".pdf"
-'ì—‘ì…€ë¡œ ì €ì¥í• ì§€ ê²°ì •
-    If SaveToXlsx Then wb.Close SaveChanges:=True, FileName:=savePath Else wb.Close SaveChanges:=False
+'¿¢¼¿·Î ÀúÀåÇÒÁö °áÁ¤
+    If SaveToXlsx Then Wb.Close SaveChanges:=True, fileName:=savePath Else Wb.Close SaveChanges:=False
     If OriginalKiller Then Kill ToDeleteDir
     SaveFilesWithCustomDirectory = savePath
     On Error GoTo 0
@@ -106,28 +107,28 @@ End Function
 
 Function FindFilesWithTextInName(directoryPath As String, searchText As String, _
                                         Optional FileExtForSort As String) As Collection
-    Dim FileName As String, filePath As String, FEFS As Long
+    Dim fileName As String, filePath As String, FEFS As Long
     Dim resultPaths As New Collection
     
-    FileName = Dir(directoryPath & "\*.*") ' ì§€ì •ëœ ë””ë ‰í† ë¦¬ì—ì„œ íŒŒì¼ ëª©ë¡ ì–»ê¸°
-    ' íŒŒì¼ ëª©ë¡ì„ í™•ì¸í•˜ë©´ì„œ ì¡°ê±´ì— ë§ëŠ” íŒŒì¼ ì°¾ê¸°
-    Do While FileName <> ""
-        ' íŒŒì¼ ì´ë¦„ì— íŠ¹ì • í…ìŠ¤íŠ¸ê°€ í¬í•¨ë˜ì–´ ìˆëŠ”ì§€ í™•ì¸
-        FEFS = IIf(FileExtForSort = "", 1, InStr(1, FileName, FileExtForSort, vbBinaryCompare))
-        If InStr(1, FileName, searchText, vbTextCompare) > 0 And FEFS > 0 Then
-            ' ì¡°ê±´ì— ë§ëŠ” íŒŒì¼ì˜ ê²½ë¡œë¥¼ ìƒì„±
-            filePath = directoryPath & "\" & FileName
-            ' ì¡°ê±´ì— ë§ëŠ” íŒŒì¼ì˜ ê²½ë¡œë¥¼ ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€
+    fileName = Dir(directoryPath & "\*.*") ' ÁöÁ¤µÈ µğ·ºÅä¸®¿¡¼­ ÆÄÀÏ ¸ñ·Ï ¾ò±â
+    ' ÆÄÀÏ ¸ñ·ÏÀ» È®ÀÎÇÏ¸é¼­ Á¶°Ç¿¡ ¸Â´Â ÆÄÀÏ Ã£±â
+    Do While fileName <> ""
+        ' ÆÄÀÏ ÀÌ¸§¿¡ Æ¯Á¤ ÅØ½ºÆ®°¡ Æ÷ÇÔµÇ¾î ÀÖ´ÂÁö È®ÀÎ
+        FEFS = IIf(FileExtForSort = "", 1, InStr(1, fileName, FileExtForSort, vbBinaryCompare))
+        If InStr(1, fileName, searchText, vbTextCompare) > 0 And FEFS > 0 Then
+            ' Á¶°Ç¿¡ ¸Â´Â ÆÄÀÏÀÇ °æ·Î¸¦ »ı¼º
+            filePath = directoryPath & "\" & fileName
+            ' Á¶°Ç¿¡ ¸Â´Â ÆÄÀÏÀÇ °æ·Î¸¦ ¸®½ºÆ®¿¡ Ãß°¡
             resultPaths.Add filePath
         End If
-        FileName = Dir ' ë‹¤ìŒ íŒŒì¼ ê²€ìƒ‰
+        fileName = Dir ' ´ÙÀ½ ÆÄÀÏ °Ë»ö
     Loop
     
-    ' ì¡°ê±´ì— ë§ëŠ” íŒŒì¼ì´ í•˜ë‚˜ ì´ìƒì¸ ê²½ìš° ë¦¬ìŠ¤íŠ¸ ë°˜í™˜
+    ' Á¶°Ç¿¡ ¸Â´Â ÆÄÀÏÀÌ ÇÏ³ª ÀÌ»óÀÎ °æ¿ì ¸®½ºÆ® ¹İÈ¯
     If resultPaths.Count > 0 Then
         Set FindFilesWithTextInName = resultPaths
     Else
-        ' ì¡°ê±´ì— ë§ëŠ” íŒŒì¼ì„ ì°¾ì§€ ëª»í•œ ê²½ìš° ë¹ˆ Collection ë°˜í™˜
+        ' Á¶°Ç¿¡ ¸Â´Â ÆÄÀÏÀ» Ã£Áö ¸øÇÑ °æ¿ì ºó Collection ¹İÈ¯
         Set FindFilesWithTextInName = New Collection
     End If
 End Function
@@ -193,7 +194,7 @@ Public Function GetRangeBoundary(rng As Range, _
     
 End Function
 
-' CountCountinuousNonEmptyCells / ë¹„ì–´ìˆì§€ ì•Šì€ ì…€ì˜ ê°œìˆ˜ë¥¼ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜ / CountNonEmptyCells
+' CountCountinuousNonEmptyCells / ºñ¾îÀÖÁö ¾ÊÀº ¼¿ÀÇ °³¼ö¸¦ ¹İÈ¯ÇÏ´Â ÇÔ¼ö / CountNonEmptyCells
 Public Function fCCNEC(ByVal TargetRange As Range) As Long
     Dim cell As Range
     Dim Count As Long
@@ -205,18 +206,18 @@ Public Function fCCNEC(ByVal TargetRange As Range) As Long
     For Each cell In TargetRange
         If Not IsEmpty(cell.value) Then
             If Not foundValue Then
-                foundValue = True ' ìµœì´ˆì˜ ê°’ ìˆëŠ” ì…€ì„ ì°¾ìŒ
+                foundValue = True ' ÃÖÃÊÀÇ °ª ÀÖ´Â ¼¿À» Ã£À½
             End If
-            Count = Count + 1 ' ì—°ì†ëœ ê°’ ì¹´ìš´íŠ¸
+            Count = Count + 1 ' ¿¬¼ÓµÈ °ª Ä«¿îÆ®
         ElseIf foundValue Then
-            Exit For ' ì²« ê°’ ì´í›„ ê³µë°±ì„ ë§Œë‚˜ë©´ ì¢…ë£Œ
+            Exit For ' Ã¹ °ª ÀÌÈÄ °ø¹éÀ» ¸¸³ª¸é Á¾·á
         End If
     Next cell
     
     fCCNEC = Count
 End Function
 
-' ì…€ ê¸°ì¤€ìœ¼ë¡œ  ì¤„ ê¸‹ëŠ” ì„œë¸Œë£¨í‹´
+' ¼¿ ±âÁØÀ¸·Î  ÁÙ ±ß´Â ¼­ºê·çÆ¾
 Public Sub CellLiner(ByRef Target As Range, _
                                 Optional vEdge As XlBordersIndex = xlEdgeTop, _
                                 Optional vLineStyle As XlLineStyle = xlContinuous, _
@@ -289,7 +290,7 @@ Public Sub SelfMerge(ByRef MergeTarget As Range)
         Next c
     Next r
     
-    ' ë³‘í•© ë° í…ìŠ¤íŠ¸ ì‚½ì…
+    ' º´ÇÕ ¹× ÅØ½ºÆ® »ğÀÔ
     With MergeTarget
         .Merge
         .value = ValueList
@@ -299,45 +300,59 @@ Public Sub SelfMerge(ByRef MergeTarget As Range)
 End Sub
 
 Public Function ExtractBracketValue(ByVal Txt As String, Optional ByRef Searching As Long = 1) As String
+    Txt = Trim(CStr(Txt)) ' ÀÚµ¿±³Á¤
     Dim sPos As Long, ePos As Long
     sPos = InStr(Searching, Txt, "["): ePos = InStr(Searching + 1, Txt, "]")
     
     If sPos > 0 And ePos > sPos Then
-        ExtractBracketValue = Mid(Txt, sPos + 1, ePos - sPos - 1)
+        ExtractBracketValue = mid(Txt, sPos + 1, ePos - sPos - 1)
     Else
         ExtractBracketValue = ""
     End If
     Searching = ePos
 End Function
 
-Public Sub DeleteDuplicateRowsInColumn(ByVal targetCol As Long, ByRef StartRow As Long, ByRef EndRow As Long, _
+Public Function ExtractSmallBracketValue(ByVal Txt As String, Optional ByRef Searching As Long = 1) As String
+    Txt = Trim(CStr(Txt)) ' ÀÚµ¿±³Á¤
+    Dim sPos As Long, ePos As Long
+    sPos = InStr(Searching, Txt, "("): ePos = InStr(Searching + 1, Txt, ")")
+    
+    If sPos > 0 And ePos > sPos Then
+        ExtractSmallBracketValue = mid(Txt, sPos + 1, ePos - sPos - 1)
+    Else
+        ExtractSmallBracketValue = ""
+    End If
+    Searching = ePos
+End Function
+
+Public Sub DeleteDuplicateRowsInColumn(ByVal targetCol As Long, ByRef startRow As Long, ByRef EndRow As Long, _
         Optional ByRef tgtWs As Worksheet)
 
-    Dim colValues As New Collection   ' ì¤‘ë³µ ì²´í¬ìš© ì»¬ë ‰ì…˜
+    Dim colValues As New Collection   ' Áßº¹ Ã¼Å©¿ë ÄÃ·º¼Ç
     Dim i As Long, DeleteRowCount As Long
     Dim cellVal As String
 
-    If tgtWs Is Nothing Then Set tgtWs = ActiveSheet ' ë²”ìš©ì„± í™•ë³´
+    If tgtWs Is Nothing Then Set tgtWs = ActiveSheet ' ¹ü¿ë¼º È®º¸
 
-    ' ì•„ë˜ì—ì„œ ìœ„ë¡œ ìˆœíšŒí•˜ë©´ì„œ ì¤‘ë³µ ê²€ì‚¬ ë° ì‚­ì œ
-    For i = EndRow To StartRow Step -1
-        ' ì§€ì •ëœ ì»¬ëŸ¼ì˜ ê°’ì„ ê°€ì ¸ì™€ ê³µë°± ì œê±°
+    ' ¾Æ·¡¿¡¼­ À§·Î ¼øÈ¸ÇÏ¸é¼­ Áßº¹ °Ë»ç ¹× »èÁ¦
+    For i = EndRow To startRow Step -1
+        ' ÁöÁ¤µÈ ÄÃ·³ÀÇ °ªÀ» °¡Á®¿Í °ø¹é Á¦°Å
         cellVal = Trim$(tgtWs.Cells(i, targetCol).value)
 
-        ' ë¹ˆ ë¬¸ìì—´ì´ ì•„ë‹ ë•Œë§Œ ê²€ì‚¬
+        ' ºó ¹®ÀÚ¿­ÀÌ ¾Æ´Ò ¶§¸¸ °Ë»ç
         If Len(cellVal) > 0 Then
             On Error Resume Next
-            ' í‚¤ë¡œ cellValì„ ì§€ì •í•˜ì—¬ ì»¬ë ‰ì…˜ì— ì¶”ê°€ ì‹œë„
-            colValues.Add Item:=cellVal, key:=cellVal
+            ' Å°·Î cellValÀ» ÁöÁ¤ÇÏ¿© ÄÃ·º¼Ç¿¡ Ãß°¡ ½Ãµµ
+            colValues.Add Item:=cellVal, Key:=cellVal
 
-            ' ì˜¤ë¥˜ ë²ˆí˜¸ 457: ì´ë¯¸ ë™ì¼í•œ Keyê°€ ì¡´ì¬í•¨ì„ ì˜ë¯¸
+            ' ¿À·ù ¹øÈ£ 457: ÀÌ¹Ì µ¿ÀÏÇÑ Key°¡ Á¸ÀçÇÔÀ» ÀÇ¹Ì
             If Err.Number = 457 Then
-                ' ì¤‘ë³µìœ¼ë¡œ íŒë‹¨ëœ í–‰ì„ ì‚­ì œ
+                ' Áßº¹À¸·Î ÆÇ´ÜµÈ ÇàÀ» »èÁ¦
                 tgtWs.Rows(i).Delete
                 DeleteRowCount = DeleteRowCount + 1
             End If
 
-            ' ì˜¤ë¥˜ ìƒíƒœ ì´ˆê¸°í™”
+            ' ¿À·ù »óÅÂ ÃÊ±âÈ­
             Err.Clear
             On Error GoTo 0
         End If
@@ -347,7 +362,7 @@ Public Sub DeleteDuplicateRowsInColumn(ByVal targetCol As Long, ByRef StartRow A
 End Sub
 
 '---------------------------
-' 2) ì •ê·œì‹ í—¬í¼(Late Binding)
+' 2) Á¤±Ô½Ä ÇïÆÛ(Late Binding)
 '---------------------------
 Private Function RxFirst(ByVal pattern As String, ByVal text As String) As String
     Dim rx As Object, m As Object
@@ -357,70 +372,70 @@ Private Function RxFirst(ByVal pattern As String, ByVal text As String) As Strin
     rx.IgnoreCase = True
     If rx.test(text) Then
         Set m = rx.Execute(text)(0)
-        RxFirst = m.SubMatches(0) ' ë°˜ë“œì‹œ () ìº¡ì²˜ 1ê°œì§œë¦¬ íŒ¨í„´ ì „ì œ
+        RxFirst = m.SubMatches(0) ' ¹İµå½Ã () Ä¸Ã³ 1°³Â¥¸® ÆĞÅÏ ÀüÁ¦
     Else
         RxFirst = vbNullString
     End If
 End Function
 
 '---------------------------
-' 3) í•œêµ­ì–´ ìš”ì¼ ë°˜í™˜
+' 3) ÇÑ±¹¾î ¿äÀÏ ¹İÈ¯
 '---------------------------
 Private Function WeekdayKorean(d As Date) As String
     Select Case Weekday(d, vbSunday)
-        Case vbSunday:    WeekdayKorean = "ì¼"
-        Case vbMonday:    WeekdayKorean = "ì›”"
-        Case vbTuesday:   WeekdayKorean = "í™”"
-        Case vbWednesday: WeekdayKorean = "ìˆ˜"
-        Case vbThursday:  WeekdayKorean = "ëª©"
-        Case vbFriday:    WeekdayKorean = "ê¸ˆ"
-        Case vbSaturday:  WeekdayKorean = "í† "
+        Case vbSunday:    WeekdayKorean = "ÀÏ"
+        Case vbMonday:    WeekdayKorean = "¿ù"
+        Case vbTuesday:   WeekdayKorean = "È­"
+        Case vbWednesday: WeekdayKorean = "¼ö"
+        Case vbThursday:  WeekdayKorean = "¸ñ"
+        Case vbFriday:    WeekdayKorean = "±İ"
+        Case vbSaturday:  WeekdayKorean = "Åä"
     End Select
 End Function
 
 '---------------------------
-' 4) íŒŒì¼ëª… íŒŒì„œ
-'   ì˜ˆ) "DailyPlan 5ì›”-28ì¼_C11.xlsx"
+' 4) ÆÄÀÏ¸í ÆÄ¼­
+'   ¿¹) "DailyPlan 5¿ù-28ÀÏ_C11.xlsx"
 '---------------------------
 Private Function ParseMDToken(ByVal fullPath As String, Optional ByVal BaseYear As Long = 0) As MDToken
     Dim t As MDToken, nm As String
-    Dim ms As String, ds As String, ln As String, dt As Date, y As Long
+    Dim ms As String, ds As String, ln As String, dt As Date, Y As Long
    
-    nm = Mid$(fullPath, InStrRev(fullPath, "\") + 1)
+    nm = mid$(fullPath, InStrRev(fullPath, "\") + 1)
     nm = Replace$(nm, ".xlsx", "", , , vbTextCompare)
     t.fullPath = fullPath
-    t.FileName = nm
+    t.fileName = nm
    
-    ' ë¬¸ì„œíƒ€ì…
+    ' ¹®¼­Å¸ÀÔ
     If InStr(1, nm, "DailyPlan", vbTextCompare) > 0 Then
         t.DocType = dc_DailyPlan
     ElseIf InStr(1, nm, "PartList", vbTextCompare) > 0 Then
         t.DocType = dc_PartList
     Else
-        t.DocType = 0 ' ì•Œ ìˆ˜ ì—†ìŒ
+        t.DocType = 0 ' ¾Ë ¼ö ¾øÀ½
     End If
    
-    ' ì›”/ì¼   (ì˜ˆ: "5ì›”-28ì¼" / "09ì›”-05ì¼")
-    ms = RxFirst("([0-9]{1,2})(?=ì›”)", nm)
-    ds = RxFirst("([0-9]{1,2})(?=ì¼)", nm)
+    ' ¿ù/ÀÏ   (¿¹: "5¿ù-28ÀÏ" / "09¿ù-05ÀÏ")
+    ms = RxFirst("([0-9]{1,2})(?=¿ù)", nm)
+    ds = RxFirst("([0-9]{1,2})(?=ÀÏ)", nm)
    
     If Len(ms) > 0 Then t.Month = CInt(ms)
     If Len(ds) > 0 Then t.Day = CInt(ds)
    
-    ' ë¼ì¸   (ì˜ˆ: "_C11" , "C11")
+    ' ¶óÀÎ   (¿¹: "_C11" , "C11")
     ln = RxFirst("C([0-9]{1,3})", nm)
     If Len(ln) > 0 Then t.LineAddr = "C" & ln
    
-    ' ì—°ë„
+    ' ¿¬µµ
     If BaseYear = 0 Then
-        y = Year(Date) ' ê¸°ë³¸ í˜„ì¬ ì—°ë„
+        Y = Year(Date) ' ±âº» ÇöÀç ¿¬µµ
     Else
-        y = BaseYear
+        Y = BaseYear
     End If
    
     If t.Month >= 1 And t.Day >= 1 Then
         On Error Resume Next
-        dt = DateSerial(y, t.Month, t.Day)
+        dt = DateSerial(Y, t.Month, t.Day)
         On Error GoTo 0
         If dt > 0 Then
             t.DateValue = dt
@@ -433,10 +448,10 @@ Private Function ParseMDToken(ByVal fullPath As String, Optional ByVal BaseYear 
 End Function
 
 '---------------------------------------------
-' 5) ListView ì„ ë³„ ì¶”ê°€ê¸° (ìš”ì¼/ë¼ì¸ í•„í„°)
-'    wantDocType  : 0 ì´ë©´ íƒ€ì… ë¬´ì‹œ
-'    wantLine     : "" ì´ë©´ ë¼ì¸ ë¬´ì‹œ (ì˜ˆ: "C11")
-'    wantWeekday  : 0 ì´ë©´ ìš”ì¼ ë¬´ì‹œ (vbMonday ë“±)
+' 5) ListView ¼±º° Ãß°¡±â (¿äÀÏ/¶óÀÎ ÇÊÅÍ)
+'    wantDocType  : 0 ÀÌ¸é Å¸ÀÔ ¹«½Ã
+'    wantLine     : "" ÀÌ¸é ¶óÀÎ ¹«½Ã (¿¹: "C11")
+'    wantWeekday  : 0 ÀÌ¸é ¿äÀÏ ¹«½Ã (vbMonday µî)
 '---------------------------------------------
 Public Sub FillListView_ByFilter(ByRef files As Collection, ByRef lv As ListView, _
         Optional ByVal wantDocType As DocumentTypes = 0, _
@@ -450,27 +465,27 @@ Public Sub FillListView_ByFilter(ByRef files As Collection, ByRef lv As ListView
    
     With lv
         .ListItems.Clear
-        ' ì»¬ëŸ¼ í—¤ë” êµ¬ì„± ì˜ˆì‹œ (í•„ìš” ì‹œ í•œ ë²ˆë§Œ êµ¬ì„±)
+        ' ÄÃ·³ Çì´õ ±¸¼º ¿¹½Ã (ÇÊ¿ä ½Ã ÇÑ ¹ø¸¸ ±¸¼º)
         If .ColumnHeaders.Count = 0 Then
-            .ColumnHeaders.Add , , "ë‚ ì§œ"
-            .ColumnHeaders.Add , , "ìš”ì¼"
-            .ColumnHeaders.Add , , "ë¼ì¸"
-            .ColumnHeaders.Add , , "ë¬¸ì„œ"
-            .ColumnHeaders.Add , , "ê²½ë¡œ"
+            .ColumnHeaders.Add , , "³¯Â¥"
+            .ColumnHeaders.Add , , "¿äÀÏ"
+            .ColumnHeaders.Add , , "¶óÀÎ"
+            .ColumnHeaders.Add , , "¹®¼­"
+            .ColumnHeaders.Add , , "°æ·Î"
         End If
     End With
    
     For i = 1 To files.Count
         t = ParseMDToken(CStr(files(i)), BaseYear)
-        If wantDocType <> 0 Then If t.DocType <> wantDocType Then GoTo CONTINUE_NEXT ' íƒ€ì… í•„í„°
-        If Len(wantLine) > 0 Then If StrComp(t.LineAddr, wantLine, vbTextCompare) <> 0 Then GoTo CONTINUE_NEXT ' ë¼ì¸ í•„í„°
-        If wantWeekday <> 0 Then If t.WeekdayVb <> wantWeekday Then GoTo CONTINUE_NEXT ' ìš”ì¼ í•„í„°
+        If wantDocType <> 0 Then If t.DocType <> wantDocType Then GoTo CONTINUE_NEXT ' Å¸ÀÔ ÇÊÅÍ
+        If Len(wantLine) > 0 Then If StrComp(t.LineAddr, wantLine, vbTextCompare) <> 0 Then GoTo CONTINUE_NEXT ' ¶óÀÎ ÇÊÅÍ
+        If wantWeekday <> 0 Then If t.WeekdayVb <> wantWeekday Then GoTo CONTINUE_NEXT ' ¿äÀÏ ÇÊÅÍ
        
-        ' ListView ì…ë ¥
+        ' ListView ÀÔ·Â
         If t.DateValue > 0 Then
-            Set it = lv.ListItems.Add(, , Format$(t.DateValue, "mì›”-dì¼"))
+            Set it = lv.ListItems.Add(, , Format$(t.DateValue, "m¿ù-dÀÏ"))
         Else
-            Set it = lv.ListItems.Add(, , "ë¯¸ìƒ")
+            Set it = lv.ListItems.Add(, , "¹Ì»ó")
         End If
        
         it.SubItems(1) = t.WeekdayK
@@ -484,20 +499,20 @@ CONTINUE_NEXT:
 End Sub
 
 '---------------------------------------------
-' 6) ì‚¬ìš© ì¤‘ì¸ GetFoundSentences êµì²´íŒ
-'    - íŒ¨í„´ ë¬¸ìì—´ ëŒ€ì‹  ìš©ë„ êµ¬ë¶„: "date" ë˜ëŠ” "line"
-'    - ê¸°ì¡´ ì½”ë“œ í˜¸í™˜ ëª©ì : "*ì›”-*ì¼" -> "date", "*-Line" -> "line"
+' 6) »ç¿ë ÁßÀÎ GetFoundSentences ±³Ã¼ÆÇ
+'    - ÆĞÅÏ ¹®ÀÚ¿­ ´ë½Å ¿ëµµ ±¸ºĞ: "date" ¶Ç´Â "line"
+'    - ±âÁ¸ ÄÚµå È£È¯ ¸ñÀû: "*¿ù-*ÀÏ" -> "date", "*-Line" -> "line"
 '---------------------------------------------
 Public Function GetFoundSentences(ByVal Search As String, ByVal Target As String) As String
     Dim nm As String, ms As String, ds As String, ln As String
-    nm = Mid$(Target, InStrRev(Target, "\") + 1)
+    nm = mid$(Target, InStrRev(Target, "\") + 1)
     nm = Replace$(nm, ".xlsx", "", , , vbTextCompare)
    
-    If InStr(1, Search, "ì›”", vbTextCompare) > 0 Then
-        ms = RxFirst("([0-9]{1,2})(?=ì›”)", nm)
-        ds = RxFirst("([0-9]{1,2})(?=ì¼)", nm)
+    If InStr(1, Search, "¿ù", vbTextCompare) > 0 Then
+        ms = RxFirst("([0-9]{1,2})(?=¿ù)", nm)
+        ds = RxFirst("([0-9]{1,2})(?=ÀÏ)", nm)
         If Len(ms) > 0 And Len(ds) > 0 Then
-            GetFoundSentences = CStr(CLng(ms)) & "ì›”-" & CStr(CLng(ds)) & "ì¼"
+            GetFoundSentences = CStr(CLng(ms)) & "¿ù-" & CStr(CLng(ds)) & "ÀÏ"
         Else
             GetFoundSentences = ""
         End If
@@ -510,19 +525,19 @@ Public Function GetFoundSentences(ByVal Search As String, ByVal Target As String
         Exit Function
     End If
    
-    ' ê¸°íƒ€: ê¸°ë³¸ì€ ê³µë°±
+    ' ±âÅ¸: ±âº»Àº °ø¹é
     GetFoundSentences = ""
 End Function
-'--- ë‚ ì§œ/ë¼ì¸ í‚¤ ë¹Œë“œ: íŒŒì¼ëª… ì˜ˆ) "DailyPlan 5ì›”-28ì¼_C11.xlsx"
+'--- ³¯Â¥/¶óÀÎ Å° ºôµå: ÆÄÀÏ¸í ¿¹) "DailyPlan 5¿ù-28ÀÏ_C11.xlsx"
 Private Function BuildKeyFromPath(ByVal fullPath As String, Optional ByVal BaseYear As Long = 0) As String
     Dim nm As String, m As String, d As String, ln As String
-    Dim y As Long, dt As Date
+    Dim Y As Long, dt As Date
    
-    nm = Mid$(fullPath, InStrRev(fullPath, "\") + 1)
+    nm = mid$(fullPath, InStrRev(fullPath, "\") + 1)
     nm = Replace$(nm, ".xlsx", "", , , vbTextCompare)
    
-    m = RxFirst("([0-9]{1,2})(?=ì›”)", nm)
-    d = RxFirst("([0-9]{1,2})(?=ì¼)", nm)
+    m = RxFirst("([0-9]{1,2})(?=¿ù)", nm)
+    d = RxFirst("([0-9]{1,2})(?=ÀÏ)", nm)
     ln = RxFirst("C([0-9]{1,3})", nm)
    
     If Len(m) = 0 Or Len(d) = 0 Or Len(ln) = 0 Then
@@ -530,30 +545,30 @@ Private Function BuildKeyFromPath(ByVal fullPath As String, Optional ByVal BaseY
         Exit Function
     End If
    
-    If BaseYear = 0 Then y = Year(Date) Else y = BaseYear
+    If BaseYear = 0 Then Y = Year(Date) Else Y = BaseYear
     On Error Resume Next
-    dt = DateSerial(y, CLng(m), CLng(d))
+    dt = DateSerial(Y, CLng(m), CLng(d))
     On Error GoTo 0
     If dt = 0 Then
         BuildKeyFromPath = vbNullString
         Exit Function
     End If
    
-    ' í‚¤ ì •ê·œí™”: yyyy-mm-dd|C##
+    ' Å° Á¤±ÔÈ­: yyyy-mm-dd|C##
     BuildKeyFromPath = Format$(dt, "yyyy-mm-dd") & "|" & "C" & CStr(CLng(ln))
 End Function
 
-'--- êµì§‘í•©ì„ outLVì— ì±„ìš°ê¸° (ì…ë ¥: íŒŒì¼ ê²½ë¡œ ì»¬ë ‰ì…˜ 2ê°œ)
+'--- ±³ÁıÇÕÀ» outLV¿¡ Ã¤¿ì±â (ÀÔ·Â: ÆÄÀÏ °æ·Î ÄÃ·º¼Ç 2°³)
 Public Sub FillListView_Intersection(ByRef filesA As Collection, ByRef filesB As Collection, ByRef outLV As ListView, _
                                             Optional ByVal BaseYear As Long = 0, _
                                             Optional ByVal A_Discription As String, Optional ByVal B_Discription As String, Optional ByVal C_Discription As String, Optional ByVal D_Discription As String)
     Dim i As Long
-    Dim keyMap As New Collection         ' Key ì „ìš© Map (Collectionì„ Mapì²˜ëŸ¼ ì‚¬ìš©)
-    Dim itemA As String, itemB As String, key As String
+    Dim keyMap As New Collection         ' Key Àü¿ë Map (CollectionÀ» MapÃ³·³ »ç¿ë)
+    Dim itemA As String, itemB As String, Key As String
     Dim it As listItem
-    If A_Discription = "" Then A_Discription = "Aê²½ë¡œ": If B_Discription = "" Then B_Discription = "Bê²½ë¡œ"
-    If C_Discription = "" Then C_Discription = "Cê²½ë¡œ": If D_Discription = "" Then D_Discription = "Dê²½ë¡œ"
-    ' ì»¬ëŸ¼ êµ¬ì„±(ìµœì´ˆ 1íšŒ)
+    If A_Discription = "" Then A_Discription = "A°æ·Î": If B_Discription = "" Then B_Discription = "B°æ·Î"
+    If C_Discription = "" Then C_Discription = "C°æ·Î": If D_Discription = "" Then D_Discription = "D°æ·Î"
+    ' ÄÃ·³ ±¸¼º(ÃÖÃÊ 1È¸)
     With outLV
         .ListItems.Clear
         If .ColumnHeaders.Count = 0 Then
@@ -564,35 +579,35 @@ Public Sub FillListView_Intersection(ByRef filesA As Collection, ByRef filesB As
         End If
     End With
    
-    ' 1) Aì§‘í•© Key ì ì¬ (Key ì¶©ëŒì€ ë¬´ì‹œ)
+    ' 1) AÁıÇÕ Key ÀûÀç (Key Ãæµ¹Àº ¹«½Ã)
     For i = 1 To filesA.Count
         itemA = CStr(filesA(i))
-        key = BuildKeyFromPath(itemA, BaseYear)
-        If Len(key) > 0 Then
+        Key = BuildKeyFromPath(itemA, BaseYear)
+        If Len(Key) > 0 Then
             On Error Resume Next
-                keyMap.Add itemA, key     ' Item=ì›ë³¸ê²½ë¡œ, Key=ì •ê·œí™”í‚¤
-                ' ì´ë¯¸ ì¡´ì¬í•˜ë©´ Err=457 -> ìµœì´ˆ í•œ ê°œë§Œ ë³´ê´€(ì¡´ì¬ì„± ì²´í¬ê°€ ëª©ì )
+                keyMap.Add itemA, Key     ' Item=¿øº»°æ·Î, Key=Á¤±ÔÈ­Å°
+                ' ÀÌ¹Ì Á¸ÀçÇÏ¸é Err=457 -> ÃÖÃÊ ÇÑ °³¸¸ º¸°ü(Á¸Àç¼º Ã¼Å©°¡ ¸ñÀû)
                 Err.Clear
             On Error GoTo 0
         End If
     Next i
    
-    ' 2) Bë¥¼ ìˆœíšŒí•˜ë©° êµì§‘í•©ë§Œ ì¶œë ¥
+    ' 2) B¸¦ ¼øÈ¸ÇÏ¸ç ±³ÁıÇÕ¸¸ Ãâ·Â
     For i = 1 To filesB.Count
         itemB = CStr(filesB(i))
-        key = BuildKeyFromPath(itemB, BaseYear)
-        If Len(key) = 0 Then GoTo CONT_NEXT
+        Key = BuildKeyFromPath(itemB, BaseYear)
+        If Len(Key) = 0 Then GoTo CONT_NEXT
        
-        ' ì¡´ì¬ì„± ê²€ì‚¬: col.Item(key) â†’ ì—ëŸ¬ ì—†ìœ¼ë©´ ì¡´ì¬
+        ' Á¸Àç¼º °Ë»ç: col.Item(key) ¡æ ¿¡·¯ ¾øÀ¸¸é Á¸Àç
         Dim aPath As String, dtText As String, lnText As String
         On Error Resume Next
-            aPath = CStr(keyMap.Item(key))   ' ì—†ìœ¼ë©´ ì—ëŸ¬
+            aPath = CStr(keyMap.Item(Key))   ' ¾øÀ¸¸é ¿¡·¯
         If Err.Number = 0 Then
-            ' í‚¤ì—ì„œ í‘œì‹œìš© ë‚ ì§œ/ë¼ì¸ ë¶„ë¦¬
-            dtText = Split(key, "|")(0)      ' yyyy-mm-dd
-            lnText = Split(key, "|")(1)      ' C##
+            ' Å°¿¡¼­ Ç¥½Ã¿ë ³¯Â¥/¶óÀÎ ºĞ¸®
+            dtText = Split(Key, "|")(0)      ' yyyy-mm-dd
+            lnText = Split(Key, "|")(1)      ' C##
             With outLV
-                Set it = .ListItems.Add(, , Format$(CDate(dtText), "mì›”-dì¼"))
+                Set it = .ListItems.Add(, , Format$(CDate(dtText), "m¿ù-dÀÏ"))
                 it.SubItems(1) = lnText
                 it.SubItems(2) = aPath
                 it.SubItems(3) = itemB
@@ -606,17 +621,17 @@ CONT_NEXT:
     'LvAutoFit outLV
 End Sub
 
-' ë¬¸ìì—´ì˜ ì˜ˆìƒ í­ì„ ptë¡œ ê·¼ì‚¬ ê³„ì‚° (ê°€ë³ê³  ë¹ ë¥¸ ì¶”ì •ì¹˜)
+' ¹®ÀÚ¿­ÀÇ ¿¹»ó ÆøÀ» pt·Î ±Ù»ç °è»ê (°¡º±°í ºü¸¥ ÃßÁ¤Ä¡)
 Public Function LenA(ByVal Expression As String, _
                      Optional ByVal Achr As Single = 14.9, _
                      Optional ByVal LatinScale As Single = 2 / 5) As Single
     Dim w As Single, i As Long, code As Long, n As Long: n = Len(Expression)
     If n = 0 Then LenA = 0: Exit Function
     For i = 1 To n
-        code = AscW(Mid$(Expression, i, 1)) ' Mid$ ì‚¬ìš©: Variant ë°©ì§€ + ì•½ê°„ ë” ë¹ ë¦„
-        If code >= &HAC00 And code <= &HD7A3 Then w = w + Achr Else w = w + Achr * LatinScale ' ê°€(AC00=44032) ~ í£(D7A3=55203)
+        code = AscW(mid$(Expression, i, 1)) ' Mid$ »ç¿ë: Variant ¹æÁö + ¾à°£ ´õ ºü¸§
+        If code >= &HAC00 And code <= &HD7A3 Then w = w + Achr Else w = w + Achr * LatinScale ' °¡(AC00=44032) ~ ÆR(D7A3=55203)
     Next i
-    LenA = w  ' Single ê·¸ëŒ€ë¡œ ë°˜í™˜ (ì†Œìˆ˜ì  ìœ ì§€)
+    LenA = w  ' Single ±×´ë·Î ¹İÈ¯ (¼Ò¼öÁ¡ À¯Áö)
 End Function
 
 Public Sub LvAutoFit(ByRef lvw As MSComctlLib.ListView, Optional ByVal UseHeader As Boolean = True)
@@ -656,7 +671,7 @@ Public Sub Diagnose_MSCOMCTL()
     On Error GoTo 0
 
     Debug.Print String(60, "-")
-    Debug.Print "â€» MISSINGì´ë©´ Tools>Referencesì—ì„œ Browseë¡œ MSCOMCTL.OCX ì¬ì§€ì • í›„ ì²´í¬."
+    Debug.Print "¡Ø MISSINGÀÌ¸é Tools>References¿¡¼­ Browse·Î MSCOMCTL.OCX ÀçÁöÁ¤ ÈÄ Ã¼Å©."
 End Sub
 
 Private Function FileExists(ByVal f As String) As Boolean

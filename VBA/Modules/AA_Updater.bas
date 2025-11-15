@@ -1,28 +1,34 @@
+Attribute VB_Name = "AA_Updater"
+#Const isDev = True
 Private Const ThisModuleName As String = "AA_Updater"
-' í´ë”êµ¬ì¡°ë¡œ ì„ ë³„ í›„ ì¶œë ¥
-Sub ExportAllVbaComponents()
-    Dim vbComp As Object, fso As Object
-    Dim basePath As String, folderModules As String, folderClasses As String, folderForms As String, fileName As String
 
-    ' ê¸°ë³¸ ê²½ë¡œ ì„¤ì •
+' Æú´õ±¸Á¶·Î ¼±º° ÈÄ Ãâ·Â
+Sub ExportAllVbaComponents()
+    Dim vbComp As Object
+    Dim fso As Object
+    Dim basePath As String
+    Dim folderModules As String, folderClasses As String, folderForms As String
+    Dim fileName As String
+
+    ' ±âº» °æ·Î ¼³Á¤
     basePath = ThisWorkbook.Path & "\ExcelExportedCodes\"
     folderModules = basePath & "Modules\"
     folderClasses = basePath & "Classes\"
     folderForms = basePath & "Forms\"
 
-    ' í´ë” ìƒì„±
+    ' Æú´õ »ı¼º
     Set fso = CreateObject("Scripting.FileSystemObject")
     If Not fso.FolderExists(basePath) Then fso.CreateFolder basePath
     If Not fso.FolderExists(folderModules) Then fso.CreateFolder folderModules
     If Not fso.FolderExists(folderClasses) Then fso.CreateFolder folderClasses
     If Not fso.FolderExists(folderForms) Then fso.CreateFolder folderForms
 
-    ' êµ¬ì„± ìš”ì†Œ ë°˜ë³µí•˜ë©° ë‚´ë³´ë‚´ê¸°
+    ' ±¸¼º ¿ä¼Ò ¹İº¹ÇÏ¸ç ³»º¸³»±â
     For Each vbComp In ThisWorkbook.VBProject.VBComponents
         Select Case vbComp.Type
-            Case 1: fileName = folderModules & vbComp.Name & ".bas"   ' í‘œì¤€ ëª¨ë“ˆ
-            Case 2: fileName = folderClasses & vbComp.Name & ".cls"   ' í´ë˜ìŠ¤ ëª¨ë“ˆ
-            Case 3: fileName = folderForms & vbComp.Name & ".frm"     ' ì‚¬ìš©ì í¼
+            Case 1: fileName = folderModules & vbComp.Name & ".bas"   ' Ç¥ÁØ ¸ğµâ
+            Case 2: fileName = folderClasses & vbComp.Name & ".cls"   ' Å¬·¡½º ¸ğµâ
+            Case 3: fileName = folderForms & vbComp.Name & ".frm"     ' »ç¿ëÀÚ Æû
             Case Else: fileName = vbNullString
         End Select
 
@@ -31,28 +37,28 @@ Sub ExportAllVbaComponents()
         End If
     Next vbComp
 
-    MsgBox "êµ¬ì„± ìš”ì†Œê°€ í´ë” êµ¬ì¡°ë¡œ ë‚´ë³´ë‚´ì¡ŒìŠµë‹ˆë‹¤." & vbLf & basePath, vbInformation
+    MsgBox "±¸¼º ¿ä¼Ò°¡ Æú´õ ±¸Á¶·Î ³»º¸³»Á³½À´Ï´Ù." & vbLf & basePath, vbInformation
 End Sub
-' .Txt .Md ì¶œë ¥
+' .Txt .Md Ãâ·Â
 Sub ExportAllModulesDirectlyToTextAndMarkdown()
     Dim vbComp As Object, fso As Object, txtStream As Object, mdStream As Object
     Dim exportPath As String, ext As String, fileName As String
-    Dim codeLine As Variant, codeLines() As String
-    Dim baseName As String, timeStamp As String, TxtFile As String, mdFile As String
+    Dim codeLine As Variant
+    Dim codeLines() As String, baseName As String, timeStamp As String, TxtFile As String, mdFile As String
     Dim totalLines As Long
 
-    ' íŒŒì¼ëª… êµ¬ì„±
+    ' ÆÄÀÏ¸í ±¸¼º
     baseName = Left(ThisWorkbook.Name, InStrRev(ThisWorkbook.Name, ".") - 1)
     timeStamp = Format(Now, "yymmddhhmm")
     exportPath = ThisWorkbook.Path & "\ExcelExportedCodes\"
     TxtFile = exportPath & baseName & "_SourceCode_" & timeStamp & ".txt"
     mdFile = exportPath & baseName & "_SourceCode_" & timeStamp & ".md"
 
-    ' í´ë” ìƒì„±
+    ' Æú´õ »ı¼º
     Set fso = CreateObject("Scripting.FileSystemObject")
     If Not fso.FolderExists(exportPath) Then fso.CreateFolder exportPath
 
-    ' ìŠ¤íŠ¸ë¦¼ ìƒì„± (UTF-8)
+    ' ½ºÆ®¸² »ı¼º (UTF-8)
     Set txtStream = CreateObject("ADODB.Stream")
     With txtStream
         .Charset = "utf-8"
@@ -67,7 +73,7 @@ Sub ExportAllModulesDirectlyToTextAndMarkdown()
         .open
     End With
 
-    ' êµ¬ì„± ìš”ì†Œ ë°˜ë³µ
+    ' ±¸¼º ¿ä¼Ò ¹İº¹
     For Each vbComp In ThisWorkbook.VBProject.VBComponents
         Select Case vbComp.Type
             Case 1: ext = ".bas"
@@ -80,19 +86,19 @@ Sub ExportAllModulesDirectlyToTextAndMarkdown()
             fileName = vbComp.Name & ext
             totalLines = vbComp.CodeModule.CountOfLines
 
-            ' ì½”ë“œ ì½ê¸°
+            ' ÄÚµå ÀĞ±â
             If totalLines > 0 Then
                 codeLines = Split(vbComp.CodeModule.Lines(1, totalLines), vbLf)
             Else
                 codeLines = Split("", vbLf)
             End If
 
-            ' TXT íŒŒì¼ ì‘ì„±
+            ' TXT ÆÄÀÏ ÀÛ¼º
             txtStream.WriteText String(60, "'") & vbLf
             txtStream.WriteText fileName & " Start" & vbLf
             txtStream.WriteText String(60, "'") & vbLf
 
-            ' MD íŒŒì¼ ì‘ì„±
+            ' MD ÆÄÀÏ ÀÛ¼º
             mdStream.WriteText "### " & fileName & vbLf
             mdStream.WriteText "````vba" & vbLf
 
@@ -109,13 +115,13 @@ Sub ExportAllModulesDirectlyToTextAndMarkdown()
         End If
     Next vbComp
 
-    ' ì €ì¥ ë° ë‹«ê¸°
+    ' ÀúÀå ¹× ´İ±â
     txtStream.SaveToFile TxtFile, 2
     txtStream.Close
     mdStream.SaveToFile mdFile, 2
     mdStream.Close
 
-    MsgBox "ëª¨ë“  ì½”ë“œê°€ ë³‘í•©ë˜ì–´ ì €ì¥ë˜ì—ˆìŠµë‹ˆë‹¤!" & vbLf & _
+    MsgBox "¸ğµç ÄÚµå°¡ º´ÇÕµÇ¾î ÀúÀåµÇ¾ú½À´Ï´Ù!" & vbLf & _
            TxtFile & vbLf & mdFile, vbInformation
 End Sub
 
@@ -128,42 +134,45 @@ Sub ForceUpdateMacro()
     Dim ws As Worksheet
     Dim VersionCell As Range
     
-    ' Setting í™•ì¸
+    ' Setting È®ÀÎ
     Set ws = ThisWorkbook.Worksheets("Setting")
     If ("Dev" = ws.Cells.Find(What:="Develop", lookAt:=xlWhole, MatchCase:=True).Offset(0, 1).value) Then
-        MsgBox "ê°œë°œ ëª¨ë“œì´ë¯€ë¡œ ì—…ë°ì´íŠ¸ ì§„í–‰ ì œí•œ", vbInformation, "ê°œë°œì—¬ë¶€ í™•ì¸"
+        #If Not isDev Then
+            MsgBox "°³¹ß ¸ğµåÀÌ¹Ç·Î ¾÷µ¥ÀÌÆ® ÁøÇà Á¦ÇÑ", vbInformation, "°³¹ß¿©ºÎ È®ÀÎ"
+        #End If
         Exit Sub
     End If
+
     Set VersionCell = ws.Cells.Find(What:="Version", lookAt:=xlWhole, MatchCase:=True)
     'Debug.Print VersionCell.Address
     
-    ' GitLab Raw URL ì„¤ì •
+    ' GitLab Raw URL ¼³Á¤
     versionUrl = "http://mod.lge.com/hub/seongsu1.lee/excelmacroupdater/-/raw/main/Version.txt"
     fileUrl = "http://mod.lge.com/hub/seongsu1.lee/excelmacroupdater/-/raw/main/AutoReport.xlsb"
     
-    ' í˜„ì¬ ì‚¬ìš© ì¤‘ì¸ ë²„ì „ (Setting Worksheetì˜ Version í–‰ì„ ì°¾ì•„ ê°’ ì—´ì˜ ê°’ì„ ì°¸ì¡°í•¨)
+    ' ÇöÀç »ç¿ë ÁßÀÎ ¹öÀü (Setting WorksheetÀÇ Version ÇàÀ» Ã£¾Æ °ª ¿­ÀÇ °ªÀ» ÂüÁ¶ÇÔ)
     localVersion = VersionCell.Offset(0, 1).value
     
-    ' ìµœì‹  ë²„ì „ í™•ì¸
+    ' ÃÖ½Å ¹öÀü È®ÀÎ
     latestVersion = GetWebText(versionUrl)
     
-    ' ë²„ì „ ë¹„êµ ë° ì—…ë°ì´íŠ¸ ìˆ˜í–‰
+    ' ¹öÀü ºñ±³ ¹× ¾÷µ¥ÀÌÆ® ¼öÇà
     If Trim(localVersion) < Trim(latestVersion) Then
-        MsgBox "ìƒˆ ë²„ì „(" & latestVersion & ")ì´ ê°ì§€ë˜ì—ˆìŠµë‹ˆë‹¤. ì—…ë°ì´íŠ¸ë¥¼ ì§„í–‰í•©ë‹ˆë‹¤.", vbInformation
+        MsgBox "»õ ¹öÀü(" & latestVersion & ")ÀÌ °¨ÁöµÇ¾ú½À´Ï´Ù. ¾÷µ¥ÀÌÆ®¸¦ ÁøÇàÇÕ´Ï´Ù.", vbInformation
         
-        ' ë‹¤ìš´ë¡œë“œ ê²½ë¡œ ì„¤ì •
+        ' ´Ù¿î·Îµå °æ·Î ¼³Á¤
         savePath = Environ("TEMP") & "\NewMacro.xlsb"
         
-        ' ìµœì‹  ë§¤í¬ë¡œ íŒŒì¼ ë‹¤ìš´ë¡œë“œ
+        ' ÃÖ½Å ¸ÅÅ©·Î ÆÄÀÏ ´Ù¿î·Îµå
         If DownloadFile(fileUrl, savePath) Then
-            ' ê¸°ì¡´ íŒŒì¼ ë‹«ê¸° ë° ìƒˆ íŒŒì¼ ì‹¤í–‰
+            ' ±âÁ¸ ÆÄÀÏ ´İ±â ¹× »õ ÆÄÀÏ ½ÇÇà
             ThisWorkbook.Close False
             Workbooks.open savePath
         Else
-            MsgBox "ì—…ë°ì´íŠ¸ ë‹¤ìš´ë¡œë“œì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤.", vbExclamation
+            MsgBox "¾÷µ¥ÀÌÆ® ´Ù¿î·Îµå¿¡ ½ÇÆĞÇß½À´Ï´Ù.", vbExclamation
         End If
     Else
-        MsgBox "í˜„ì¬ ìµœì‹  ë²„ì „ì„ ì‚¬ìš© ì¤‘ì…ë‹ˆë‹¤.", vbInformation
+        MsgBox "ÇöÀç ÃÖ½Å ¹öÀüÀ» »ç¿ë ÁßÀÔ´Ï´Ù.", vbInformation
     End If
 End Sub
 
@@ -171,11 +180,11 @@ Function GetWebText(url As String) As String
     Dim http As Object
     Set http = CreateObject("MSXML2.XMLHTTP")
     
-    ' ìš”ì²­ ì „ì†¡
+    ' ¿äÃ» Àü¼Û
     http.open "GET", url, False
     http.Send
     
-    ' ì‘ë‹µ í™•ì¸
+    ' ÀÀ´ä È®ÀÎ
     If http.Status = 200 Then
         GetWebText = http.responseText
     Else
@@ -190,11 +199,11 @@ Function DownloadFile(url As String, savePath As String) As Boolean
     On Error Resume Next
     Set http = CreateObject("MSXML2.XMLHTTP")
     
-    ' íŒŒì¼ ë‹¤ìš´ë¡œë“œ ìš”ì²­
+    ' ÆÄÀÏ ´Ù¿î·Îµå ¿äÃ»
     http.open "GET", url, False
     http.Send
     
-    ' ë‹¤ìš´ë¡œë“œ í™•ì¸
+    ' ´Ù¿î·Îµå È®ÀÎ
     If http.Status = 200 Then
         Set stream = CreateObject("ADODB.Stream")
         stream.Type = 1
@@ -203,17 +212,17 @@ Function DownloadFile(url As String, savePath As String) As Boolean
         stream.SaveToFile savePath, 2
         stream.Close
         
-        ' ë‹¤ìš´ë¡œë“œ ì„±ê³µ
+        ' ´Ù¿î·Îµå ¼º°ø
         DownloadFile = True
     Else
-        ' ë‹¤ìš´ë¡œë“œ ì‹¤íŒ¨
+        ' ´Ù¿î·Îµå ½ÇÆĞ
         DownloadFile = False
     End If
 End Function
 
-' === Export êµ¬ì¡° ê¸°ë°˜ Import ìœ í‹¸ë¦¬í‹° ===
-' - Exportëœ ëª¨ë“ˆì„ í´ë”ì—ì„œ ë¶ˆëŸ¬ì™€ ThisWorkbookì— ì ì¬
-' - ì¤‘ë³µëœ ëª¨ë“ˆëª…ì€ ìë™ ì œê±° í›„ Import
+' === Export ±¸Á¶ ±â¹İ Import À¯Æ¿¸®Æ¼ ===
+' - ExportµÈ ¸ğµâÀ» Æú´õ¿¡¼­ ºÒ·¯¿Í ThisWorkbook¿¡ ÀûÀç
+' - Áßº¹µÈ ¸ğµâ¸íÀº ÀÚµ¿ Á¦°Å ÈÄ Import
 
 Public Sub ImportAllVbaComponents()
     Dim basePath As String
@@ -223,7 +232,7 @@ Public Sub ImportAllVbaComponents()
     ImportModulesFromFolder basePath & "Classes\"
     ImportModulesFromFolder basePath & "Forms\"
    
-    MsgBox "Import ì™„ë£Œ!", vbInformation
+    MsgBox "Import ¿Ï·á!", vbInformation
 End Sub
 
 Private Sub ImportModulesFromFolder(ByVal folderPath As String)
@@ -238,8 +247,8 @@ Private Sub ImportModulesFromFolder(ByVal folderPath As String)
     For Each file In files
         If IsVbaFile(file.Name) Then
             vbCompName = GetVBNameFromFile(file.Path)
-            If LenB(vbCompName) > 0 And Not (vbCompName = ThisModuleName) Then
-                ' ê¸°ì¡´ ëª¨ë“ˆ ì‚­ì œ
+            If LenB(vbCompName) > 0 Then
+                ' ±âÁ¸ ¸ğµâ »èÁ¦
                 On Error Resume Next
                 vbProj.VBComponents.Remove vbProj.VBComponents(vbCompName)
                 On Error GoTo 0
@@ -251,7 +260,7 @@ End Sub
 
 Private Function IsVbaFile(ByVal fileName As String) As Boolean
     Dim ext As String
-    ext = LCase$(Mid(fileName, InStrRev(fileName, ".") + 1))
+    ext = LCase$(mid(fileName, InStrRev(fileName, ".") + 1))
     IsVbaFile = (ext = "bas" Or ext = "cls" Or ext = "frm")
 End Function
 

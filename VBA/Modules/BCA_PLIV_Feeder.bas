@@ -1,7 +1,8 @@
+Attribute VB_Name = "BCA_PLIV_Feeder"
 Option Explicit
 #Const COM = True
 Private ws As Worksheet
-Private Feeders As New Collection  ' FeederUnitë“¤ì„ ë‹´ê¸° ìœ„í•œ ì»¬ë ‰ì…˜
+Private Feeders As New Collection  ' FeederUnitµéÀ» ´ã±â À§ÇÑ ÄÃ·º¼Ç
 Private LV_F As New ListView, LV_Fi As New ListView, LV_PLfF As New ListView
 
 Public Sub SetUp_FeederTrackers()
@@ -20,7 +21,7 @@ Public Sub SortColumnByFeeder(ByRef Feeder As Collection)
     If ws Is Nothing Then Debug.Print "Err.WorkSheet is Nothing": Exit Sub
     Dim Chk As Range, itemRange As Range: Set itemRange = ws.Rows(1).Find("-Line", LookIn:=xlValues, lookAt:=xlPart)
     Dim FirstCol As Long, LastCol As Long, i As Long
-    ' ì´ˆê¸°í™”
+    ' ÃÊ±âÈ­
     FirstCol = itemRange.Column + 2: LastCol = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
     Set itemRange = ws.Range(ws.Cells(1, FirstCol), ws.Cells(1, LastCol))
     ws.Columns.EntireColumn.Hidden = False
@@ -28,13 +29,13 @@ Public Sub SortColumnByFeeder(ByRef Feeder As Collection)
     Replacing_Feeder2item Feeder
     
     For Each Chk In itemRange
-        ' Feeder ì»¬ë ‰ì…˜ë‚´ì˜ í•­ëª©ì¸ì§€ ê²€ì‚¬ í›„ ëª©ë¡ ì¤‘ ì—†ì„ ê²½ìš° í•´ë‹¹ ì—´ì„ ìˆ¨ê¹€ì²˜ë¦¬ í•˜ëŠ” ì½”ë“œ
+        ' Feeder ÄÃ·º¼Ç³»ÀÇ Ç×¸ñÀÎÁö °Ë»ç ÈÄ ¸ñ·Ï Áß ¾øÀ» °æ¿ì ÇØ´ç ¿­À» ¼û±èÃ³¸® ÇÏ´Â ÄÚµå
         ws.Columns(Chk.Column).Hidden = Not IsInCollection(Chk.value, Feeder)
     Next Chk
 End Sub
 
-' item ê·œì¹™ " " -> vbLf // VBA ë‚´ë¶€ ì—°ì‚°ì‹œ ë³€í™˜ í•„ìš”
-' Feeder ê·œì¹™ vbLf -> " ", "_" -> " " // VBA ì™¸ë¶€ í‘œí˜„ì‹œ ë³€í™˜ í•„ìš”. ì˜ˆë¥¼ ë“¤ë©´ UI/UX ë˜ëŠ” ì›Œí¬ì‹œíŠ¸ ì…€ì—ì„œ í‘œê¸°í• ë•Œ ì‚¬ìš©ë¨.
+' item ±ÔÄ¢ " " -> vbLf // VBA ³»ºÎ ¿¬»ê½Ã º¯È¯ ÇÊ¿ä
+' Feeder ±ÔÄ¢ vbLf -> " ", "_" -> " " // VBA ¿ÜºÎ Ç¥Çö½Ã º¯È¯ ÇÊ¿ä. ¿¹¸¦ µé¸é UI/UX ¶Ç´Â ¿öÅ©½ÃÆ® ¼¿¿¡¼­ Ç¥±âÇÒ¶§ »ç¿ëµÊ.
 Private Sub Replacing_Feeder2item(ByRef Target As Collection)
     Dim Copied As New Collection, i As Long
     For i = 1 To Target.Count
@@ -61,7 +62,7 @@ Private Sub Replacing_item2Feeder(ByRef Target As Collection)
 End Sub
 
 Public Sub A_Delete_Feeder()
-    ' ì„ íƒëœ ê°’ê³¼ ì½¤ë³´ ë¦¬ìŠ¤íŠ¸ ì¤‘ ì¤‘ë³µë˜ëŠ” ì¸ë±ìŠ¤ë¥¼ ì°¾ì•„ í•´ë‹¹ í”¼ë”ë¥¼ ì‚­ì œí•˜ëŠ” ì½”ë“œ
+    ' ¼±ÅÃµÈ °ª°ú ÄŞº¸ ¸®½ºÆ® Áß Áßº¹µÇ´Â ÀÎµ¦½º¸¦ Ã£¾Æ ÇØ´ç ÇÇ´õ¸¦ »èÁ¦ÇÏ´Â ÄÚµå
     If UI.CbBx_Feeder.ListCount = 0 Then UI.CbBx_Feeder.value = "": Exit Sub
     Dim i As Long
     Dim Target As String: Target = UI.CbBx_Feeder.value
@@ -72,7 +73,7 @@ Public Sub A_Delete_Feeder()
     Next i
 End Sub
 Public Sub A_New_Feeder()
-    ' ì½¤ë³´ë°•ìŠ¤ ë¦¬ìŠ¤íŠ¸ì™€ ì¤‘ë³µë˜ì§€ ì•Šê²Œë” í”¼ë” ì´ë¦„ì„ ì¶”ê°€í•˜ê³  í”¼ë”ìœ ë‹›ì„ ìƒì„±í•¨
+    ' ÄŞº¸¹Ú½º ¸®½ºÆ®¿Í Áßº¹µÇÁö ¾Ê°Ô²û ÇÇ´õ ÀÌ¸§À» Ãß°¡ÇÏ°í ÇÇ´õÀ¯´ÖÀ» »ı¼ºÇÔ
     If UI.CbBx_Feeder.value = "" Then Exit Sub
     Dim NewFeeder As New FeederUnit
     If Not FOTFC(UI.CbBx_Feeder.value, UI.CbBx_Feeder) Then
@@ -80,22 +81,22 @@ Public Sub A_New_Feeder()
         NewFeeder.Name = UI.CbBx_Feeder.value
         Feeders.Add NewFeeder, NewFeeder.Name
     Else
-        MsgBox "ì¤‘ë³µëœ Feeder ì¶”ê°€", vbCritical
+        MsgBox "Áßº¹µÈ Feeder Ãß°¡", vbCritical
     End If
 End Sub
 Public Sub A_Save_Feeder()
-    ' ì‹¤ì‹œê°„ ìˆ˜ì •ì¤‘ì¸ ì‚¬í•­ë“¤ì„ ì €ì¥í•˜ëŠ” ì½”ë“œ
+    ' ½Ç½Ã°£ ¼öÁ¤ÁßÀÎ »çÇ×µéÀ» ÀúÀåÇÏ´Â ÄÚµå
 End Sub
 Public Sub Select_Feeder_Target()
-    ' ì„ íƒëœ í”¼ë” ì´ë¦„ì„ ì°¸ì¡°í•˜ì—¬, í”¼ë”ìœ ë‹›ì˜ ì•„ì´í…œ ì»¬ë ‰ì…˜ì„ ë¦¬ìŠ¤íŠ¸ë·°ì— ì ì¬í•˜ëŠ” ì½”ë“œ
-    ' ì½¤ë³´ë°•ìŠ¤ë¥¼ ë³€ê²½í•˜ëŠ” ì´ë²¤íŠ¸ ë°œìƒì‹œ ì‹¤í–‰ë¨.
+    ' ¼±ÅÃµÈ ÇÇ´õ ÀÌ¸§À» ÂüÁ¶ÇÏ¿©, ÇÇ´õÀ¯´ÖÀÇ ¾ÆÀÌÅÛ ÄÃ·º¼ÇÀ» ¸®½ºÆ®ºä¿¡ ÀûÀçÇÏ´Â ÄÚµå
+    ' ÄŞº¸¹Ú½º¸¦ º¯°æÇÏ´Â ÀÌº¥Æ® ¹ß»ı½Ã ½ÇÇàµÊ.
     
 End Sub
 Public Sub B_Read_Feeder()
-    ' ì™¸ë¶€ë¡œ ì†¡ì¶œëœ í”¼ë”ëª©ë¡ì„ ë¶ˆëŸ¬ì™€ ì½¤ë³´ë°•ìŠ¤ë¥¼ ì±„ìš°ëŠ” ì½”ë“œ
+    ' ¿ÜºÎ·Î ¼ÛÃâµÈ ÇÇ´õ¸ñ·ÏÀ» ºÒ·¯¿Í ÄŞº¸¹Ú½º¸¦ Ã¤¿ì´Â ÄÚµå
 End Sub
 Public Sub B_Send_Feeder()
-    ' ì‹¤ì‹œê°„ í¸ì§‘ì¤‘ì¸ í”¼ë”ìœ ë‹›ë“¤ì„ ì—‘ì…€ ì™¸ë¶€ë¡œ ì†¡ì¶œí•˜ì—¬ ì§€ì •ëœ ë””ë ‰í† ë¦¬ì— ì €ì¥í•˜ëŠ” ì½”ë“œ
+    ' ½Ç½Ã°£ ÆíÁıÁßÀÎ ÇÇ´õÀ¯´ÖµéÀ» ¿¢¼¿ ¿ÜºÎ·Î ¼ÛÃâÇÏ¿© ÁöÁ¤µÈ µğ·ºÅä¸®¿¡ ÀúÀåÇÏ´Â ÄÚµå
 End Sub
 
 Public Sub C_Additem_List()
@@ -108,9 +109,9 @@ Public Sub C_Additem_List()
         
     End With
     For i = 1 To ToLV.ListItems.Count
-        If StrComp(ToLV.ListItems(i), Target, vbTextCompare) = 0 Then Exit Sub ' ì¤‘ë³µëœ ì•„ì´í…œ ì¶”ê°€ì‹œ Exit
+        If StrComp(ToLV.ListItems(i), Target, vbTextCompare) = 0 Then Exit Sub ' Áßº¹µÈ ¾ÆÀÌÅÛ Ãß°¡½Ã Exit
     Next i
-    ToLV.ListItems.Add(, , Target).Checked = True ' ë¦¬ìŠ¤íŠ¸ë·°ì— ì¶”ê°€
+    ToLV.ListItems.Add(, , Target).Checked = True ' ¸®½ºÆ®ºä¿¡ Ãß°¡
 End Sub
 Public Sub C_Removeitem_List()
     With LV_Fi
